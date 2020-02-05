@@ -9,4 +9,7 @@
 
 rootProject.name = 'revolut-interview'
 include 'application'
+include 'rest-api'
+include 'core'
+include 'core-api'
 
