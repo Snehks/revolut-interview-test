@@ -15,7 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.inject.Provider;
-import javax.persistence.LockModeType;
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -49,11 +48,11 @@ class MoneyTransferServiceTest {
     @Mock
     private TransferLogDAO transferLogDAO;
 
-    private MoneyTransferService moneyTransferService;
+    private TransferService transferService;
 
     @BeforeEach
     void setUp() {
-        moneyTransferService = new MoneyTransferService(sessionProvider,
+        transferService = new TransferService(sessionProvider,
                 accountsDAO,
                 transferLogDAO
         );
@@ -65,7 +64,7 @@ class MoneyTransferServiceTest {
     @Test
     void shouldThrowAccountNotFoundExceptionIfSenderDoesNotExist() {
         var accountNotFoundException = assertThrows(AccountNotFoundException.class,
-                () -> moneyTransferService.transfer(new AccountDTO(100L, Money.valueOf(1)), RECEIVER, Money.valueOf(100))
+                () -> transferService.transfer(new AccountDTO(100L, Money.valueOf(1)), RECEIVER, Money.valueOf(100))
         );
 
         assertEquals(100L, accountNotFoundException.getId().longValue());
@@ -77,7 +76,7 @@ class MoneyTransferServiceTest {
         setUpAccounts();
 
         var accountNotFoundException = assertThrows(AccountNotFoundException.class,
-                () -> moneyTransferService.transfer(SENDER, new AccountDTO(100L, Money.valueOf(1)), Money.valueOf(1))
+                () -> transferService.transfer(SENDER, new AccountDTO(100L, Money.valueOf(1)), Money.valueOf(1))
         );
 
         assertEquals(100L, accountNotFoundException.getId().longValue());
@@ -86,24 +85,24 @@ class MoneyTransferServiceTest {
     @Test
     void transferShouldThrowExceptionWhenBalanceIsInsufficient() {
         assertThrows(InSufficientEnoughBalanceException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, Money.valueOf(100))
+                () -> transferService.transfer(SENDER, RECEIVER, Money.valueOf(100))
         );
     }
 
     @Test
     void shouldThrowExceptionWhenMoneyToTransferIsLessThanEqualToZero() {
         assertThrows(IllegalArgumentException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, Money.valueOf(-1))
+                () -> transferService.transfer(SENDER, RECEIVER, Money.valueOf(-1))
         );
 
         assertThrows(IllegalArgumentException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, Money.valueOf(0))
+                () -> transferService.transfer(SENDER, RECEIVER, Money.valueOf(0))
         );
     }
 
     @Test
     void senderAccountShouldBeUpdatedWithExpectedParameters() {
-        moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
+        transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
 
         var accountEntityCaptor = ArgumentCaptor.forClass(AccountEntity.class);
         verify(accountsDAO, times(2)).update(accountEntityCaptor.capture());
@@ -119,7 +118,7 @@ class MoneyTransferServiceTest {
 
     @Test
     void receiverAccountShouldBeUpdatedWithExpectedParameters() {
-        moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
+        transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
 
         var accountEntityCaptor = ArgumentCaptor.forClass(AccountEntity.class);
         verify(accountsDAO, times(2)).update(accountEntityCaptor.capture());
@@ -135,7 +134,7 @@ class MoneyTransferServiceTest {
 
     @Test
     void databaseTransactionShouldBeCommittedWhenTransferSucceeds() {
-        moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
+        transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
 
         verify(transaction).begin();
         verify(transaction).commit();
@@ -146,7 +145,7 @@ class MoneyTransferServiceTest {
         simulateUpdateFailureForAccount(SENDER);
 
         assertThrows(RuntimeException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
+                () -> transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
         );
 
         verify(transaction).rollback();
@@ -157,7 +156,7 @@ class MoneyTransferServiceTest {
         simulateUpdateFailureForAccount(RECEIVER);
 
         assertThrows(RuntimeException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
+                () -> transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
         );
 
         verify(transaction).rollback();
@@ -170,7 +169,7 @@ class MoneyTransferServiceTest {
                 .save(any(TransferLogEntity.class));
 
         assertThrows(RuntimeException.class,
-                () -> moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
+                () -> transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER)
         );
 
         verify(transaction).rollback();
@@ -178,7 +177,7 @@ class MoneyTransferServiceTest {
 
     @Test
     void moneyTransferIsLoggedOnDatabaseWithExpectedValues() {
-        moneyTransferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
+        transferService.transfer(SENDER, RECEIVER, MONEY_TO_TRANSFER);
 
         var transferLogCaptor = ArgumentCaptor.forClass(TransferLogEntity.class);
         verify(transferLogDAO).save(transferLogCaptor.capture());

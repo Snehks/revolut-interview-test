@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
 import static javax.persistence.LockModeType.PESSIMISTIC_WRITE;
 
 @Singleton
-public class MoneyTransferService {
+public class TransferService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -27,7 +27,7 @@ public class MoneyTransferService {
     private final TransferLogDAO transferLogDAO;
 
     @Inject
-    MoneyTransferService(Provider<Session> sessionProvider, AccountsDAO accountsDAO, TransferLogDAO transferLogDAO) {
+    TransferService(Provider<Session> sessionProvider, AccountsDAO accountsDAO, TransferLogDAO transferLogDAO) {
         this.sessionProvider = sessionProvider;
         this.accountsDAO = accountsDAO;
         this.transferLogDAO = transferLogDAO;

@@ -1,5 +1,6 @@
 package com.revolut.interview.account;
 
+import com.revolut.interview.persistence.AbstractDAO;
 import org.hibernate.Session;
 
 import javax.inject.Inject;
@@ -7,16 +8,13 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.persistence.LockModeType;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Singleton
-public class AccountsDAO {
-
-    private final Provider<Session> sessionProvider;
+public class AccountsDAO extends AbstractDAO<AccountEntity> {
 
     @Inject
-    public AccountsDAO(Provider<Session> sessionProvider) {
-        this.sessionProvider = sessionProvider;
+    AccountsDAO(Provider<Session> sessionProvider) {
+        super(sessionProvider);
     }
 
     public Optional<AccountEntity> findById(Long id) {
@@ -39,29 +37,5 @@ public class AccountsDAO {
             session.update(entity);
             return null;
         });
-    }
-
-    public AccountEntity save(AccountEntity accountEntity) {
-        return runInTransaction(session -> {
-            var id = session.save(accountEntity);
-            accountEntity.setId((Long) id);
-
-            return accountEntity;
-        });
-    }
-
-    private <T> T runInTransaction(Function<Session, T> task) {
-        var session = sessionProvider.get();
-        var transaction = session.getTransaction();
-
-        if (transaction.isActive()) {
-            return task.apply(session);
-        } else {
-            transaction.begin();
-            var result = task.apply(session);
-            transaction.commit();
-
-            return result;
-        }
     }
 }
