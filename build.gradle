@@ -10,6 +10,8 @@ mainClassName = 'com.revolut.interview.TransferServiceStarter'
 ext {
     guice = '4.2.2'
     log4j2 = '2.12.1'
+    hibernate = '5.4.4.Final'
+    junit5 = '5.3.1'
 }
 
 repositories {
@@ -19,8 +21,23 @@ repositories {
 dependencies {
     implementation "org.apache.logging.log4j:log4j-api:$log4j2"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:$log4j2"
-
     runtimeOnly "org.apache.logging.log4j:log4j-core:$log4j2"
 
+    implementation "org.hibernate:hibernate-core:$hibernate"
+    implementation "org.hibernate:hibernate-java8:$hibernate"
+    runtimeOnly "org.hibernate:hibernate-hikaricp:$hibernate"
+
+    runtimeOnly 'com.h2database:h2:1.4.200'
+
     implementation "com.google.inject:guice:$guice"
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5"
+
+    testImplementation "org.mockito:mockito-core:2.23.0"
+    testImplementation "org.mockito:mockito-junit-jupiter:2.23.0"
+}
+
+test {
+    useJUnitPlatform()
 }
