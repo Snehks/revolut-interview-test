@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @MappedSuperclass
-@EntityListeners(Entity.ChangeListener.class)
-public abstract class Entity {
+@EntityListeners(BaseEntity.ChangeListener.class)
+public abstract class BaseEntity {
 
     @Column(name = "created", nullable = false)
     private LocalDateTime created;
@@ -65,15 +65,15 @@ public abstract class Entity {
 
         @PrePersist
         public void setLastCreate(Object entity) {
-            if (entity instanceof Entity) {
-                ((Entity) entity).onCreate();
+            if (entity instanceof BaseEntity) {
+                ((BaseEntity) entity).onCreate();
             }
         }
 
         @PreUpdate
         public void setLastUpdated(Object entity) {
-            if (entity instanceof Entity) {
-                ((Entity) entity).onUpdate();
+            if (entity instanceof BaseEntity) {
+                ((BaseEntity) entity).onUpdate();
             }
         }
     }
@@ -81,8 +81,8 @@ public abstract class Entity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Entity)) return false;
-        Entity entity = (Entity) o;
+        if (!(o instanceof BaseEntity)) return false;
+        BaseEntity entity = (BaseEntity) o;
         return Objects.equals(id, entity.id);
     }
 

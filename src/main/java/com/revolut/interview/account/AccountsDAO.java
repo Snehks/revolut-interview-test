@@ -17,13 +17,6 @@ public class AccountsDAO extends AbstractDAO<AccountEntity> {
         super(sessionProvider);
     }
 
-    public Optional<AccountEntity> findById(Long id) {
-        return runInTransaction(session ->
-                session.byId(AccountEntity.class)
-                        .loadOptional(id)
-        );
-    }
-
     public Optional<AccountEntity> findById(Long id, LockModeType lockModeType) {
         return runInTransaction(session ->
                 Optional.ofNullable(

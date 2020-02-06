@@ -9,14 +9,15 @@ import org.junit.jupiter.api.Test;
 
 import javax.persistence.PessimisticLockException;
 import java.math.BigDecimal;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static javax.persistence.LockModeType.PESSIMISTIC_WRITE;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class AccountsDAOIntegrationTest {
 
@@ -123,7 +124,7 @@ class AccountsDAOIntegrationTest {
     }
 
     @Test
-    void shouldThrowExceptionWhenMultipleEntitiesTryToUpdateAndAccessSameAccount() throws InterruptedException, ExecutionException {
+    void shouldThrowExceptionWhenMultipleTransactionsTryToUpdateAndAccessSameAccount() throws InterruptedException, ExecutionException {
         var toSave = new AccountEntity(BigDecimal.valueOf(10.3));
         var savedEntity = accountsDAO.save(toSave);
 
@@ -149,7 +150,7 @@ class AccountsDAOIntegrationTest {
     }
 
     @Test
-    void shouldNotThrowAnyExceptionWhenMultipleThreadsTryToUpdateAndAccessDifferentAccounts() throws InterruptedException, ExecutionException {
+    void shouldNotThrowAnyExceptionWhenMultipleTransactionsTryToUpdateAndAccessDifferentAccounts() throws InterruptedException, ExecutionException {
         var toSave1 = new AccountEntity(BigDecimal.valueOf(10.3));
         var toSave2 = new AccountEntity(BigDecimal.valueOf(10.3));
 

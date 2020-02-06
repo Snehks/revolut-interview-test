@@ -12,6 +12,9 @@ ext {
     log4j2 = '2.12.1'
     hibernate = '5.4.4.Final'
     junit5 = '5.3.1'
+    mockito = '2.23.0'
+    javalin = '3.7.0'
+    h2 = '1.4.200'
 }
 
 repositories {
@@ -27,15 +30,18 @@ dependencies {
     implementation "org.hibernate:hibernate-java8:$hibernate"
     runtimeOnly "org.hibernate:hibernate-hikaricp:$hibernate"
 
-    runtimeOnly 'com.h2database:h2:1.4.200'
+    runtimeOnly "com.h2database:h2:$h2"
 
     implementation "com.google.inject:guice:$guice"
+
+    implementation "io.javalin:javalin:$javalin"
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5"
 
-    testImplementation "org.mockito:mockito-core:2.23.0"
-    testImplementation "org.mockito:mockito-junit-jupiter:2.23.0"
+    testImplementation "org.mockito:mockito-core:$mockito"
+    testImplementation "org.mockito:mockito-junit-jupiter:$mockito"
 }
 
 test {

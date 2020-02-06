@@ -1,10 +1,10 @@
 package com.revolut.interview.transfer;
 
-import com.revolut.interview.account.AccountDTO;
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountNotFoundException;
 import com.revolut.interview.account.AccountsDAO;
-import com.revolut.interview.money.Money;
+import com.revolut.interview.transactions.TransactionDAO;
+import com.revolut.interview.transactions.TransactionEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -24,19 +24,19 @@ public class TransferService {
 
     private final Provider<Session> sessionProvider;
     private final AccountsDAO accountsDAO;
-    private final TransferLogDAO transferLogDAO;
+    private final TransactionDAO transactionDAO;
 
     @Inject
-    TransferService(Provider<Session> sessionProvider, AccountsDAO accountsDAO, TransferLogDAO transferLogDAO) {
+    TransferService(Provider<Session> sessionProvider, AccountsDAO accountsDAO, TransactionDAO transactionDAO) {
         this.sessionProvider = sessionProvider;
         this.accountsDAO = accountsDAO;
-        this.transferLogDAO = transferLogDAO;
+        this.transactionDAO = transactionDAO;
     }
 
-    public void transfer(AccountDTO sender, AccountDTO receiver, Money moneyToTransfer) {
-        checkValidArgs(sender, receiver, moneyToTransfer);
+    public Long transfer(TransferRequest transferRequestDTO) {
+        checkValidArgs(transferRequestDTO);
 
-        LOGGER.info("Initiating money transfer from {} to {} for amount {}.", sender, receiver, moneyToTransfer);
+        LOGGER.info("Initiating money transfer {}.", transferRequestDTO);
 
         var transaction = sessionProvider.get()
                 .getTransaction();
@@ -45,11 +45,13 @@ public class TransferService {
 
         try {
             transaction.begin();
-            executeTransfer(sender, receiver, moneyToTransfer);
+            var transactionId = executeTransfer(transferRequestDTO);
             transaction.commit();
 
             executeSuccessfully = true;
             LOGGER.info("Money transfer completed.");
+
+            return transactionId;
         } catch (RuntimeException e) {
             LOGGER.error("An error occurred while executing the transaction.", e);
             throw e;
@@ -61,56 +63,58 @@ public class TransferService {
         }
     }
 
-    private void executeTransfer(AccountDTO sender, AccountDTO receiver, Money moneyToTransfer) {
-        var senderEntity = accountsDAO.findById(sender.getId(), PESSIMISTIC_WRITE)
-                .orElseThrow(() -> new AccountNotFoundException(sender.getId()));
+    private Long executeTransfer(TransferRequest transferRequestDTO) {
+        var senderId = transferRequestDTO.getSenderId();
+        var receiverId = transferRequestDTO.getReceiverId();
+        var moneyToTransfer = transferRequestDTO.getAmountToTransfer();
 
-        validateEnoughBalance(senderEntity, moneyToTransfer);
+        var senderEntity = accountsDAO.findById(senderId, PESSIMISTIC_WRITE)
+                .orElseThrow(() -> new AccountNotFoundException(senderId));
 
-        var receiverEntity = accountsDAO.findById(receiver.getId(), PESSIMISTIC_WRITE)
-                .orElseThrow(() -> new AccountNotFoundException(receiver.getId()));
+        validateEnoughBalance(senderEntity, moneyToTransfer.getValue());
 
-        transferMoney(senderEntity, receiverEntity, moneyToTransfer);
+        var receiverEntity = accountsDAO.findById(receiverId, PESSIMISTIC_WRITE)
+                .orElseThrow(() -> new AccountNotFoundException(receiverId));
+
+        transferMoney(senderEntity, receiverEntity, moneyToTransfer.getValue());
 
         accountsDAO.update(senderEntity);
         accountsDAO.update(receiverEntity);
 
-        logTransfer(senderEntity, receiverEntity, moneyToTransfer.getValue());
+        return logTransfer(senderEntity, receiverEntity, moneyToTransfer.getValue());
     }
 
-    private void transferMoney(AccountEntity sender, AccountEntity receiver, Money moneyToTransfer) {
-        var moneyToTransferValue = moneyToTransfer.getValue();
-
-        var sendersNewBalance = sender.getBalance().subtract(moneyToTransferValue);
-        var receiversNewBalance = receiver.getBalance().add(moneyToTransferValue);
+    private void transferMoney(AccountEntity sender, AccountEntity receiver, BigDecimal moneyToTransfer) {
+        var sendersNewBalance = sender.getBalance().subtract(moneyToTransfer);
+        var receiversNewBalance = receiver.getBalance().add(moneyToTransfer);
 
         sender.setBalance(sendersNewBalance);
         receiver.setBalance(receiversNewBalance);
     }
 
-    private void logTransfer(AccountEntity senderEntity, AccountEntity receiverEntity, BigDecimal amount) {
-        transferLogDAO.save(
-                new TransferLogEntity(
+    private Long logTransfer(AccountEntity senderEntity, AccountEntity receiverEntity, BigDecimal amount) {
+        var transaction = transactionDAO.save(
+                new TransactionEntity(
                         senderEntity,
                         receiverEntity,
                         amount
                 )
         );
+
+        return transaction.getId();
     }
 
-    private void validateEnoughBalance(AccountEntity fromEntity, Money amountToTransfer) {
-        if (fromEntity.getBalance().compareTo(amountToTransfer.getValue()) < 0) {
-            throw new InSufficientEnoughBalanceException(fromEntity.getBalance(), amountToTransfer.getValue());
+    private void validateEnoughBalance(AccountEntity fromEntity, BigDecimal amountToTransfer) {
+        if (fromEntity.getBalance().compareTo(amountToTransfer) < 0) {
+            throw new InSufficientEnoughBalanceException(fromEntity.getBalance(), amountToTransfer);
         }
     }
 
-    private void checkValidArgs(AccountDTO sender, AccountDTO receiver, Money moneyToTransfer) {
-        requireNonNull(sender);
-        requireNonNull(receiver);
-        requireNonNull(moneyToTransfer);
+    private void checkValidArgs(TransferRequest transferRequestDTO) {
+        requireNonNull(transferRequestDTO);
 
-        if (moneyToTransfer.getValue().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Money to transfer should be greater than 0. Provided: " + moneyToTransfer.getValue());
+        if (transferRequestDTO.getAmountToTransfer().getValue().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Money to transfer should be greater than 0. Provided: " + transferRequestDTO.getAmountToTransfer());
         }
     }
 }

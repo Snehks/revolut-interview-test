@@ -1,13 +1,14 @@
 package com.revolut.interview.account;
 
-import com.revolut.interview.persistence.Entity;
+import com.revolut.interview.persistence.BaseEntity;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-@javax.persistence.Entity(name = "account")
-public class AccountEntity extends Entity {
+@Entity(name = "account")
+public class AccountEntity extends BaseEntity {
 
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;

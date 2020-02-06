@@ -19,7 +19,7 @@ public class Money {
         return new Money(money.getValue());
     }
 
-    public static Money valueOf(int value) {
+    public static Money valueOf(double value) {
         return new Money(new BigDecimal(value));
     }
 
@@ -61,5 +61,9 @@ public class Money {
     @Override
     public int hashCode() {
         return Objects.hash(value);
+    }
+
+    public boolean isLessThanZero() {
+        return value.compareTo(BigDecimal.ZERO) < 0;
     }
 }

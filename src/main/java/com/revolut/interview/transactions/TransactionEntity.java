@@ -1,22 +1,32 @@
-package com.revolut.interview.transfer;
+package com.revolut.interview.transactions;
 
 import com.revolut.interview.account.AccountEntity;
-import com.revolut.interview.persistence.Entity;
+import com.revolut.interview.persistence.BaseEntity;
 
-import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.math.BigDecimal;
 
-@Table(name = "transfer_log")
-public class TransferLogEntity extends Entity {
+@Entity(name = "transactions")
+public class TransactionEntity extends BaseEntity {
 
+    @JoinColumn(name = "sender_id")
+    @OneToOne
     private AccountEntity sender;
+
+    @JoinColumn(name = "receiver_id")
+    @OneToOne
     private AccountEntity receiver;
+
+    @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    public TransferLogEntity() {
+    public TransactionEntity() {
     }
 
-    public TransferLogEntity(AccountEntity senderEntity, AccountEntity receiverEntity, BigDecimal amount) {
+    public TransactionEntity(AccountEntity senderEntity, AccountEntity receiverEntity, BigDecimal amount) {
         this.sender = senderEntity;
         this.receiver = receiverEntity;
         this.amount = amount;

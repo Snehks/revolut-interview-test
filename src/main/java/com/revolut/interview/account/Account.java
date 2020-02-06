@@ -4,13 +4,13 @@ import com.revolut.interview.money.Money;
 
 import static java.util.Objects.requireNonNull;
 
-public class AccountDTO {
+public class Account {
 
     private final Long id;
     private final Money balance;
 
-    public AccountDTO(Long id, Money balance) {
-        this.id = requireNonNull(id, "Id cannot be null.");
+    public Account(Long id, Money balance) {
+        this.id = id;
         this.balance = requireNonNull(balance, "Balance cannot be null.");
     }
 

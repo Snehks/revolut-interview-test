@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.revolut.interview.account.AccountEntity;
-import com.revolut.interview.transfer.TransferLogEntity;
+import com.revolut.interview.transactions.TransactionEntity;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -23,7 +23,7 @@ public class PersistenceModule extends AbstractModule {
         configuration.configure("hibernate.cfg.xml");
 
         configuration.addAnnotatedClass(AccountEntity.class);
-        configuration.addAnnotatedClass(TransferLogEntity.class);
+        configuration.addAnnotatedClass(TransactionEntity.class);
 
         return configuration.buildSessionFactory();
     }

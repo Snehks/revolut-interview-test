@@ -1,4 +1,4 @@
-package com.revolut.interview.transfer;
+package com.revolut.interview.transactions;
 
 import com.revolut.interview.persistence.AbstractDAO;
 import org.hibernate.Session;
@@ -8,10 +8,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
-public class TransferLogDAO extends AbstractDAO<TransferLogEntity> {
+public class TransactionDAO extends AbstractDAO<TransactionEntity> {
 
     @Inject
-    TransferLogDAO(Provider<Session> sessionProvider) {
+    TransactionDAO(Provider<Session> sessionProvider) {
         super(sessionProvider);
     }
 }
