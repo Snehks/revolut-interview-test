@@ -14,4 +14,15 @@ public class TransactionDAO extends AbstractDAO<TransactionEntity> {
     TransactionDAO(Provider<Session> sessionProvider) {
         super(sessionProvider);
     }
+
+    public boolean updateState(long id, TransactionState currentState, TransactionState newState) {
+        return runInTransactionOrStartNewIfNotRunning(session -> {
+            var query = session.createQuery("UPDATE transactions SET state = :newState WHERE state = :currentState AND id = :id");
+            query.setParameter("id", id);
+            query.setParameter("currentState", currentState.name());
+            query.setParameter("newState", newState.name());
+
+            return query.executeUpdate() > 0;
+        });
+    }
 }

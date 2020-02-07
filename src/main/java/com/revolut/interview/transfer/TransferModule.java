@@ -4,7 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import com.revolut.interview.rest.Resource;
 
-public class TransfersModule extends AbstractModule {
+public class TransferModule extends AbstractModule {
 
     @Override
     protected void configure() {

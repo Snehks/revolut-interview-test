@@ -18,17 +18,10 @@ public class AccountsDAO extends AbstractDAO<AccountEntity> {
     }
 
     public Optional<AccountEntity> findById(Long id, LockModeType lockModeType) {
-        return runInTransaction(session ->
+        return runInTransactionOrStartNewIfNotRunning(session ->
                 Optional.ofNullable(
                         session.find(AccountEntity.class, id, lockModeType)
                 )
         );
-    }
-
-    public void update(AccountEntity entity) {
-        runInTransaction(session -> {
-            session.update(entity);
-            return null;
-        });
     }
 }

@@ -15,13 +15,13 @@ class AccountsService {
         this.accountsDAO = accountsDAO;
     }
 
-    public Account getById(Long accountId) {
+    Account getById(Long accountId) {
         return accountsDAO.findById(accountId)
                 .map(this::map)
                 .orElseThrow(() -> new AccountNotFoundException(accountId));
     }
 
-    public Account save(Account account) {
+    Account save(Account account) {
         if (account.getBalance().isLessThanZero()) {
             throw new IllegalArgumentException("Money provided cannot be negative.");
         }

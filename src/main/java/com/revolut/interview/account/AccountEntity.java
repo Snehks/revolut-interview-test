@@ -4,6 +4,7 @@ import com.revolut.interview.persistence.BaseEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Version;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -12,6 +13,10 @@ public class AccountEntity extends BaseEntity {
 
     @Column(name = "balance", nullable = false)
     private BigDecimal balance;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
 
     public AccountEntity() {
     }
@@ -31,8 +36,8 @@ public class AccountEntity extends BaseEntity {
     @Override
     public String toString() {
         return "AccountEntity{" +
-                "balance=" + balance +
-                ", id=" + id +
+                "balance=" + balance.stripTrailingZeros() +
+                ", version=" + version +
                 '}';
     }
 
@@ -42,11 +47,12 @@ public class AccountEntity extends BaseEntity {
         if (!(o instanceof AccountEntity)) return false;
         if (!super.equals(o)) return false;
         AccountEntity that = (AccountEntity) o;
-        return balance.stripTrailingZeros().equals(that.balance.stripTrailingZeros());
+        return Objects.equals(balance.stripTrailingZeros(), that.balance.stripTrailingZeros()) &&
+                Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), balance);
+        return Objects.hash(super.hashCode(), balance.stripTrailingZeros(), version);
     }
 }

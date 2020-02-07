@@ -15,20 +15,12 @@ public class Money {
         this.value = value;
     }
 
-    public static Money from(Money money) {
-        return new Money(money.getValue());
-    }
-
     public static Money valueOf(double value) {
         return new Money(new BigDecimal(value));
     }
 
     public static Money valueOf(BigDecimal value) {
         return new Money(value);
-    }
-
-    Money(Money money) {
-        this(money.getValue());
     }
 
     public BigDecimal getValue() {
@@ -41,6 +33,14 @@ public class Money {
 
     public Money subtract(Money money) {
         return new Money(value.subtract(money.value));
+    }
+
+    public boolean isLessThanZero() {
+        return value.compareTo(BigDecimal.ZERO) < 0;
+    }
+
+    public boolean isLessThanEqualToZero() {
+        return value.compareTo(BigDecimal.ZERO) <= 0;
     }
 
     @Override
@@ -61,9 +61,5 @@ public class Money {
     @Override
     public int hashCode() {
         return Objects.hash(value);
-    }
-
-    public boolean isLessThanZero() {
-        return value.compareTo(BigDecimal.ZERO) < 0;
     }
 }

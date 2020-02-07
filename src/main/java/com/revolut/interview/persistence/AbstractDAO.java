@@ -18,14 +18,14 @@ public class AbstractDAO<T extends BaseEntity> {
     }
 
     public Optional<T> findById(Long id) {
-        return runInTransaction(session ->
+        return runInTransactionOrStartNewIfNotRunning(session ->
                 session.byId(entityType)
                         .loadOptional(id)
         );
     }
 
     public T save(T t) {
-        return runInTransaction(session -> {
+        return runInTransactionOrStartNewIfNotRunning(session -> {
             var id = session.save(t);
             t.setId((Long) id);
 
@@ -33,7 +33,14 @@ public class AbstractDAO<T extends BaseEntity> {
         });
     }
 
-    protected <R> R runInTransaction(Function<Session, R> returningTask) {
+    public void update(T entity) {
+        runInTransactionOrStartNewIfNotRunning(session -> {
+            session.update(entity);
+            return entity;
+        });
+    }
+
+    protected <R> R runInTransactionOrStartNewIfNotRunning(Function<Session, R> returningTask) {
         var session = sessionProvider.get();
         var transaction = session.getTransaction();
 

@@ -4,16 +4,17 @@ import com.google.inject.Guice;
 import com.google.inject.Provider;
 import com.revolut.interview.persistence.PersistenceModule;
 import org.hibernate.Session;
+import org.hibernate.StaleObjectStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.PessimisticLockException;
 import java.math.BigDecimal;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static javax.persistence.LockModeType.PESSIMISTIC_WRITE;
+import static javax.persistence.LockModeType.READ;
+import static javax.persistence.LockModeType.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,8 +36,8 @@ class AccountsDAOIntegrationTest {
     @Test
     void findByIdShouldReturnExpectedEntity() {
         var toSave = new AccountEntity(BigDecimal.valueOf(10.3));
-
         var savedEntity = accountsDAO.save(toSave);
+
         var accountEntityById = accountsDAO.findById(savedEntity.getId())
                 .orElseThrow();
 
@@ -64,7 +65,7 @@ class AccountsDAOIntegrationTest {
         var toSave = new AccountEntity(BigDecimal.valueOf(10.3));
 
         var savedEntity = accountsDAO.save(toSave);
-        var accountEntityById = accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+        var accountEntityById = accountsDAO.findById(savedEntity.getId(), READ)
                 .orElseThrow();
 
         assertEquals(toSave, accountEntityById);
@@ -78,7 +79,7 @@ class AccountsDAOIntegrationTest {
         var session = sessionProvider.get();
         session.getTransaction().begin();
 
-        var accountEntityById = accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+        var accountEntityById = accountsDAO.findById(savedEntity.getId(), READ)
                 .orElseThrow();
 
         session.getTransaction().commit();
@@ -91,7 +92,7 @@ class AccountsDAOIntegrationTest {
         var toSave = new AccountEntity(BigDecimal.valueOf(10.3));
         var savedEntity = accountsDAO.save(toSave);
 
-        var accountEntityById = accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+        var accountEntityById = accountsDAO.findById(savedEntity.getId(), WRITE)
                 .orElseThrow();
 
         accountEntityById.setBalance(BigDecimal.ZERO);
@@ -110,7 +111,7 @@ class AccountsDAOIntegrationTest {
         var session = sessionProvider.get();
         session.getTransaction().begin();
 
-        var accountEntityById = accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+        var accountEntityById = accountsDAO.findById(savedEntity.getId(), WRITE)
                 .orElseThrow();
 
         accountEntityById.setBalance(BigDecimal.ZERO);
@@ -130,19 +131,25 @@ class AccountsDAOIntegrationTest {
 
         var executorService = Executors.newFixedThreadPool(2);
 
-        executorService.submit(() -> {
+        var updateFuture = executorService.submit(() -> {
             var session = sessionProvider.get();
             session.getTransaction().begin();
 
-            accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+            accountsDAO.findById(savedEntity.getId(), WRITE)
                     .orElseThrow();
 
             var anotherUpdateFuture = executorService.submit(() -> updateBalance(savedEntity));
-            var executionException = assertThrows(ExecutionException.class, anotherUpdateFuture::get);
-            assertTrue(executionException.getCause() instanceof PessimisticLockException);
+            try {
+                anotherUpdateFuture.get();
+            } catch (InterruptedException | ExecutionException e) {
+                fail("Test failed due to ", e);
+            }
 
             session.getTransaction().commit();
-        }).get();
+        });
+
+        var executionException = assertThrows(ExecutionException.class, updateFuture::get);
+        assertTrue(executionException.getCause() instanceof StaleObjectStateException);
 
         //Hate this hack but I am not familiar with awaitility testing framework so I will avoid it
         executorService.shutdown();
@@ -163,7 +170,7 @@ class AccountsDAOIntegrationTest {
             var session = sessionProvider.get();
             session.getTransaction().begin();
 
-            var accountEntityById = accountsDAO.findById(savedEntity1.getId(), PESSIMISTIC_WRITE)
+            var accountEntityById = accountsDAO.findById(savedEntity1.getId(), WRITE)
                     .orElseThrow();
 
             try {
@@ -186,7 +193,7 @@ class AccountsDAOIntegrationTest {
         var session = sessionProvider.get();
         session.getTransaction().begin();
 
-        var accountEntityById = accountsDAO.findById(savedEntity.getId(), PESSIMISTIC_WRITE)
+        var accountEntityById = accountsDAO.findById(savedEntity.getId(), WRITE)
                 .orElseThrow();
 
         accountEntityById.setBalance(BigDecimal.ZERO);
