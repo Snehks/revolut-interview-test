@@ -15,6 +15,9 @@ ext {
     mockito = '3.2.4'
     javalin = '3.7.0'
     h2 = '1.4.200'
+    restAssured = '4.2.0'
+    spark = '2.8.0'
+    gson = '2.8.6'
 }
 
 repositories {
@@ -34,11 +37,11 @@ dependencies {
 
     implementation "com.google.inject:guice:$guice"
 
-    implementation "com.sparkjava:spark-core:2.8.0"
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation "com.sparkjava:spark-core:$spark"
+    implementation "com.google.code.gson:gson:$gson"
 
-    testImplementation 'io.rest-assured:rest-assured:4.2.0'
-    testImplementation 'io.rest-assured:json-path:4.2.0'
+    testImplementation "io.rest-assured:rest-assured:$restAssured"
+    testImplementation "io.rest-assured:json-path:$restAssured"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit5"
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junit5"

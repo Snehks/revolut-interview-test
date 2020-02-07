@@ -64,7 +64,7 @@ class AccountsResourceIntegrationTest {
 
         var jsonPath = response.jsonPath();
 
-        assertEquals(jsonPath.getLong("id"), 1);
+        assertEquals(jsonPath.getLong("id"), savedAccount.getId());
         assertEquals(jsonPath.getDouble("balance.value"), 10.00);
     }
 
