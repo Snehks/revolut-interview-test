@@ -5,7 +5,7 @@ import com.revolut.interview.account.AccountsDAO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.StaleStateException;
+import org.hibernate.StaleObjectStateException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -76,10 +76,9 @@ class TransactionExecutor {
                 .beginTransaction();
 
         try {
-            dbTransaction.begin();
             transferMoney(transactionEntity);
             dbTransaction.commit();
-        } catch (StaleStateException e) {
+        } catch (StaleObjectStateException e) {
             LOGGER.error("Transaction could not be completed because account was updated.", e);
 
             dbTransaction.rollback();

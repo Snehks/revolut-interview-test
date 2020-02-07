@@ -1,8 +1,9 @@
 package com.revolut.interview.rest;
 
-import io.javalin.Javalin;
+
+import spark.Service;
 
 public interface Resource {
 
-    void register(Javalin javalin);
+    void register(Service spark);
 }

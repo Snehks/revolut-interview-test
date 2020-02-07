@@ -1,8 +1,11 @@
 package com.revolut.interview.account;
 
+import com.google.gson.Gson;
 import com.revolut.interview.rest.Resource;
-import io.javalin.Javalin;
-import io.javalin.http.Context;
+import org.eclipse.jetty.http.HttpStatus;
+import spark.Request;
+import spark.Response;
+import spark.Service;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -11,29 +14,36 @@ import javax.inject.Singleton;
 class AccountsResource implements Resource {
 
     private final AccountsService accountsService;
+    private final Gson gson;
 
     @Inject
-    AccountsResource(AccountsService accountsService) {
+    AccountsResource(AccountsService accountsService, Gson gson) {
         this.accountsService = accountsService;
-    }
-
-    void getAccount(Context context) {
-        var accountId = Long.valueOf(context.pathParam("id"));
-        var savedAccount = accountsService.getById(accountId);
-
-        context.json(savedAccount);
-    }
-
-    void addAccount(Context context) {
-        var accountToSave = context.bodyAsClass(Account.class);
-        var savedAccount = accountsService.save(accountToSave);
-
-        context.json(savedAccount);
+        this.gson = gson;
     }
 
     @Override
-    public void register(Javalin javalin) {
-        javalin.get("/account/:id", this::getAccount);
-        javalin.post("/account", this::addAccount);
+    public void register(Service spark) {
+        spark.get("/account/:id", this::getAccount);
+        spark.post("/account", this::addAccount);
+    }
+
+    private Account getAccount(Request request, Response response) {
+        var accountId = Long.valueOf(request.params("id"));
+
+        var account = accountsService.getById(accountId);
+
+        if (account.isPresent()) {
+            return account.get();
+        }
+
+        response.status(HttpStatus.NOT_FOUND_404);
+
+        return null;
+    }
+
+    private Account addAccount(Request request, Response response) {
+        var accountToSave = gson.fromJson(request.body(), Account.class);
+        return accountsService.save(accountToSave);
     }
 }

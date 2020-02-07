@@ -77,13 +77,6 @@ class TransferServiceTest {
         assertEquals(100L, accountNotFoundException.getId().longValue());
     }
 
-    /*@Test
-    void transferShouldThrowExceptionWhenBalanceIsInsufficient() {
-        assertThrows(InSufficientBalanceException.class,
-                () -> transferService.transfer(createTransferRequest(100))
-        );
-    }*/
-
     @Test
     void shouldThrowExceptionWhenMoneyToTransferIsLessThanEqualToZero() {
         assertThrows(IllegalArgumentException.class,
@@ -92,6 +85,13 @@ class TransferServiceTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> transferService.transfer(createTransferRequest(0))
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenSenderAndReceiverAccountsAreSame() {
+        assertThrows(IllegalArgumentException.class,
+                () -> transferService.transfer(new TransferRequest(1L, 1L, Money.valueOf(10)))
         );
     }
 
@@ -127,16 +127,6 @@ class TransferServiceTest {
                 .when(accountsDAO.findById(RECEIVER.getId()))
                 .thenReturn(Optional.of(receiver));
     }
-
-    /**/
-
-    /*private void setUpSessions() {
-        lenient()
-                .when(sessionProvider.get()).thenReturn(session);
-
-        lenient()
-                .when(session.getTransaction()).thenReturn(transaction);
-    }*/
 
     private void setUpTransactionDAO() {
         lenient()

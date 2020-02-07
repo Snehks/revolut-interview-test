@@ -100,7 +100,7 @@ class TransactionExecutorTest {
     void databaseTransactionShouldBeCommittedWhenTransferSucceeds() {
         transactionExecutor.execute(VALID_TRANSACTION);
 
-        verify(dbTransaction).begin();
+        verify(session).beginTransaction();
         verify(dbTransaction).commit();
 
         verifyTransactionEntityState(SUCCEEDED);
@@ -200,7 +200,7 @@ class TransactionExecutorTest {
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
-
+        //fail("todo");
     }
 
     private void simulateUpdateFailureForAccount(AccountEntity accountEntity, Class<? extends Throwable> exceptionType) {

@@ -4,7 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.revolut.interview.rest.Resource;
-import io.javalin.Javalin;
+import spark.Service;
 
 import java.util.Set;
 
@@ -19,15 +19,15 @@ public class TransferServiceStarter {
     private static void startServer() {
         var injector = Guice.createInjector(new ApplicationModule());
 
-        var javalin = injector.getInstance(Javalin.class);
+        var spark = injector.getInstance(Service.class);
+
+        spark.port(7000);
 
         var allResources = injector.getInstance(Key.get(new TypeLiteral<Set<Resource>>() {
         }));
 
-        allResources.forEach(allResource -> allResource.register(javalin));
+        allResources.forEach(allResource -> allResource.register(spark));
 
-        getRuntime().addShutdownHook(new Thread(javalin::stop));
-
-        javalin.start(7000);
+        getRuntime().addShutdownHook(new Thread(spark::stop));
     }
 }

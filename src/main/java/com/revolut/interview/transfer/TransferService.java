@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import static java.util.Objects.requireNonNull;
 
 @Singleton
-public class TransferService {
+class TransferService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -39,27 +39,6 @@ public class TransferService {
         var transaction = createTransaction(transferRequestDTO);
 
         transactionHandler.queue(transaction.getId());
-
-        /*var executeSuccessfully = false;
-
-        try {
-            transaction.begin();
-            var transactionId = executeTransfer(transferRequestDTO);
-            transaction.commit();
-
-            executeSuccessfully = true;
-            LOGGER.info("Money transfer completed.");
-
-            return transactionId;
-        } catch (PessimisticLockException e) {
-            LOGGER.error("Transaction could not be completed because account was updated.", e);
-            throw e;
-        } finally {
-            if (!executeSuccessfully) {
-                transaction.rollback();
-                LOGGER.error("Transaction was roll-backed.");
-            }
-        }*/
     }
 
     private TransactionEntity createTransaction(TransferRequest transferRequestDTO) {
@@ -83,30 +62,15 @@ public class TransferService {
         );
     }
 
-    /*private void transferMoney(AccountEntity sender, AccountEntity receiver, BigDecimal moneyToTransfer) {
-        transferMoney(senderEntity, receiverEntity, moneyToTransfer.getValue());
-
-        accountsDAO.update(senderEntity);
-        accountsDAO.update(receiverEntity);
-
-        var sendersNewBalance = sender.getBalance().subtract(moneyToTransfer);
-        var receiversNewBalance = receiver.getBalance().add(moneyToTransfer);
-
-        sender.setBalance(sendersNewBalance);
-        receiver.setBalance(receiversNewBalance);
-    }*/
-
-   /* private void validateEnoughBalance(AccountEntity fromEntity, BigDecimal amountToTransfer) {
-        if (fromEntity.getBalance().compareTo(amountToTransfer) < 0) {
-            throw new InSufficientBalanceException(fromEntity.getBalance(), amountToTransfer);
-        }
-    }*/
-
     private void checkValidArgs(TransferRequest transferRequestDTO) {
         requireNonNull(transferRequestDTO);
 
         if (transferRequestDTO.getAmountToTransfer().isLessThanEqualToZero()) {
             throw new IllegalArgumentException("Money to transfer should be greater than 0. Provided: " + transferRequestDTO.getAmountToTransfer());
+        }
+
+        if (transferRequestDTO.getSenderId() == transferRequestDTO.getReceiverId()) {
+            throw new IllegalArgumentException("Receiver and Sender accounts cannot be the same.");
         }
     }
 }

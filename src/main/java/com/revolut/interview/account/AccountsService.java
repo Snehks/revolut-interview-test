@@ -4,6 +4,7 @@ import com.revolut.interview.money.Money;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 class AccountsService {
@@ -15,10 +16,9 @@ class AccountsService {
         this.accountsDAO = accountsDAO;
     }
 
-    Account getById(Long accountId) {
+    Optional<Account> getById(Long accountId) {
         return accountsDAO.findById(accountId)
-                .map(this::map)
-                .orElseThrow(() -> new AccountNotFoundException(accountId));
+                .map(this::map);
     }
 
     Account save(Account account) {
