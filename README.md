@@ -14,9 +14,9 @@
 1. The solution implemented assumes that the account can have just a `Single Currency`. Extension is possible in future.
 2. Some of the Implemented database queries (like get all transactions) are not optimised for `HUGE` amounts of data. This can be improved in future.
 3. The solution has 3 different `Resources`
-    - Account - To create & retrieve accounts
-    - Transfer - To initiate a transfer between 2 accounts
-    - Transaction - To view all transactions and their states for a given user
+    - Account - To create & retrieve accounts.
+    - Transfer - To initiate a transfer between 2 accounts.
+    - Transaction - To view all transactions and their states for a given account.
 
 ## How to run
 1. Build
@@ -55,5 +55,5 @@ Once the server is running use the following end points to interact with the ser
    ```
    This returns an `OK` response when transfer gets queued. The transfer can be executed anytime in the future. 
    It is not synchronous. This has been done to simulate the real bank model and to allow the transfer model to be scalable
-   across multiple servers if needed. **_For the current implementation, it just runs the transfer on a separate thread_.** 
+   across multiple servers if needed. **_For the current implementation, it just runs the transfer on a separate thread._** 
     
