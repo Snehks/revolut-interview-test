@@ -27,11 +27,11 @@ class TransactionHandlerTest {
     @Mock
     private TransactionDAO transactionDAO;
 
-    private TransactionHandler transactionHandler;
+    private TransactionService transactionHandler;
 
     @BeforeEach
     void setUp() {
-        this.transactionHandler = new TransactionHandler(transactionExecutor, transactionDAO);
+        this.transactionHandler = new TransactionService(transactionExecutor, transactionDAO);
     }
 
     @Test

@@ -7,7 +7,7 @@ import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.money.Money;
 import com.revolut.interview.transactions.TransactionDAO;
 import com.revolut.interview.transactions.TransactionEntity;
-import com.revolut.interview.transactions.TransactionHandler;
+import com.revolut.interview.transactions.TransactionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +43,7 @@ class TransferServiceTest {
     @Mock
     private TransactionDAO transactionDAO;
     @Mock
-    private TransactionHandler transactionHandler;
+    private TransactionService transactionHandler;
 
     private TransferService transferService;
 

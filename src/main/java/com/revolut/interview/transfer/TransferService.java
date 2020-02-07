@@ -4,7 +4,7 @@ import com.revolut.interview.account.AccountNotFoundException;
 import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.transactions.TransactionDAO;
 import com.revolut.interview.transactions.TransactionEntity;
-import com.revolut.interview.transactions.TransactionHandler;
+import com.revolut.interview.transactions.TransactionService;
 import com.revolut.interview.transactions.TransactionState;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,10 +22,10 @@ class TransferService {
     private final AccountsDAO accountsDAO;
     private final TransactionDAO transactionDAO;
 
-    private final TransactionHandler transactionHandler;
+    private final TransactionService transactionHandler;
 
     @Inject
-    TransferService(AccountsDAO accountsDAO, TransactionDAO transactionDAO, TransactionHandler transactionHandler) {
+    TransferService(AccountsDAO accountsDAO, TransactionDAO transactionDAO, TransactionService transactionHandler) {
         this.accountsDAO = accountsDAO;
         this.transactionDAO = transactionDAO;
         this.transactionHandler = transactionHandler;

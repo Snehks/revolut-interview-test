@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 public class TransactionDAO extends AbstractDAO<TransactionEntity> {
@@ -24,5 +25,10 @@ public class TransactionDAO extends AbstractDAO<TransactionEntity> {
 
             return query.executeUpdate() > 0;
         });
+    }
+
+    //TODO: This will return entire database, not very scalable.
+    public List<TransactionEntity> findAllWithAccountId(long accountId) {
+        return null;
     }
 }

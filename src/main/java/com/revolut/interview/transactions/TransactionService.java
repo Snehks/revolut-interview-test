@@ -2,17 +2,25 @@ package com.revolut.interview.transactions;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.stream.Collectors;
 
 @Singleton
-public class TransactionHandler {
+public class TransactionService {
 
     private final TransactionExecutor transactionExecutor;
     private final TransactionDAO transactionDAO;
 
     @Inject
-    TransactionHandler(TransactionExecutor transactionExecutor, TransactionDAO transactionDAO) {
+    TransactionService(TransactionExecutor transactionExecutor, TransactionDAO transactionDAO) {
         this.transactionExecutor = transactionExecutor;
         this.transactionDAO = transactionDAO;
+    }
+
+    public Iterable<Transaction> getAllTransactionsForAccountId(long accountId) {
+        return transactionDAO.findAllWithAccountId(accountId)
+                .stream()
+                .map(this::map)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public void queue(long transactionId) {
@@ -31,7 +39,8 @@ public class TransactionHandler {
                 transactionEntity.getId(),
                 transactionEntity.getSender().getId(),
                 transactionEntity.getReceiver().getId(),
-                transactionEntity.getAmount()
+                transactionEntity.getAmount(),
+                transactionEntity.getTransactionState()
         );
     }
 }

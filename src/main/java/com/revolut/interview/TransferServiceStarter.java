@@ -21,7 +21,7 @@ public class TransferServiceStarter {
 
         var spark = injector.getInstance(Service.class);
 
-        spark.port(7000);
+        spark.port(8000);
 
         var allResources = injector.getInstance(Key.get(new TypeLiteral<Set<Resource>>() {
         }));
