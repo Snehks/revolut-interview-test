@@ -17,7 +17,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,6 +63,5 @@ class TransferResourceTest {
         transferResource.register(spark);
 
         verify(spark).post(eq("/transfer"), any(Route.class));
-        verifyNoMoreInteractions(spark);
     }
 }

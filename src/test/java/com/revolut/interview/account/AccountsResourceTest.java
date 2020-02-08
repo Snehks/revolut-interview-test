@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,6 +103,5 @@ class AccountsResourceTest {
 
         verify(spark).post(eq("/account"), any(Route.class));
         verify(spark).get(eq("/account/:id"), any(Route.class));
-        verifyNoMoreInteractions(spark);
     }
 }

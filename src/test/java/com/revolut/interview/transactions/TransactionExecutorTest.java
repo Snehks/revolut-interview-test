@@ -2,6 +2,9 @@ package com.revolut.interview.transactions;
 
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
+import com.revolut.interview.money.Money;
+import com.revolut.interview.notification.NotificationService;
+import com.revolut.interview.notification.TransactionNotification;
 import org.hibernate.Session;
 import org.hibernate.StaleObjectStateException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +27,9 @@ import static javax.persistence.LockModeType.WRITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -51,6 +56,10 @@ class TransactionExecutorTest {
     private AccountsDAO accountsDAO;
     @Mock
     private TransactionDAO transactionDAO;
+    @Mock
+    private NotificationService notificationService;
+    @Mock
+    private BackoffStrategy backoffStrategy;
 
     private AccountEntity receiver, sender;
 
@@ -62,7 +71,9 @@ class TransactionExecutorTest {
                 Runnable::run,
                 sessionProvider,
                 accountsDAO,
-                transactionDAO
+                transactionDAO,
+                notificationService,
+                backoffStrategy
         );
 
         setUpAccountsAndTransactionDAO();
@@ -94,6 +105,19 @@ class TransactionExecutorTest {
         transactionExecutor.execute(VALID_TRANSACTION);
 
         verifyTransactionEntityState(FAILED);
+
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(BALANCE.add(TEN)));
+        verify(notificationService).sendNotification(notification);
+    }
+
+    @Test
+    void failureNotificationShouldBeSentOnFailureWhenBalanceIsInsufficient() {
+        when(transactionDAO.findById(1L)).thenReturn(Optional.of(new TransactionEntity(sender, receiver, BALANCE.add(TEN), PENDING)));
+
+        transactionExecutor.execute(VALID_TRANSACTION);
+
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(BALANCE.add(TEN)));
+        verify(notificationService).sendNotification(notification);
     }
 
     @Test
@@ -104,6 +128,14 @@ class TransactionExecutorTest {
         verify(dbTransaction).commit();
 
         verifyTransactionEntityState(SUCCEEDED);
+    }
+
+    @Test
+    void notificationShouldBeSentWhenTransactionIsSuccessful() {
+        transactionExecutor.execute(VALID_TRANSACTION);
+
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), true, Money.valueOf(VALID_TRANSACTION.getAmountToTransfer()));
+        verify(notificationService).sendNotification(notification);
     }
 
     @Test
@@ -140,6 +172,16 @@ class TransactionExecutorTest {
 
     @Test
     void transactionShouldBeRolledBackIfAStaleObjectExceptionIsThrownWhileUpdatingSenderAccount() {
+        simulateUpdateFailureForAccount(sender, StaleObjectStateException.class);
+
+        transactionExecutor.execute(VALID_TRANSACTION);
+
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(VALID_TRANSACTION.getAmountToTransfer()));
+        verify(notificationService).sendNotification(notification);
+    }
+
+    @Test
+    void notificationShouldBeSentWhenTransferFailsDueToStaleStateException() {
         simulateUpdateFailureForAccount(sender, StaleObjectStateException.class);
 
         transactionExecutor.execute(VALID_TRANSACTION);
@@ -187,6 +229,8 @@ class TransactionExecutorTest {
 
         verify(dbTransaction).rollback();
         verify(transactionDAO, times(2)).update(any(TransactionEntity.class));
+
+        verify(notificationService, never()).sendNotification(any(TransactionNotification.class));
     }
 
     @Test
@@ -195,12 +239,25 @@ class TransactionExecutorTest {
                 Runnable::run,
                 sessionProvider,
                 accountsDAO,
-                transactionDAO
-        );
+                transactionDAO,
+                notificationService, backoffStrategy);
+
+        doThrow(StaleObjectStateException.class)
+                .doNothing()
+                .when(accountsDAO)
+                .update(any(AccountEntity.class));
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
-        //fail("todo");
+        verify(dbTransaction).rollback();
+        verify(dbTransaction).commit();
+        verify(accountsDAO, times(4)).findById(anyLong(), eq(WRITE));
+        verify(accountsDAO, times(2)).update(sender);
+        verify(accountsDAO).update(receiver);
+
+        verify(notificationService).sendNotification(any(TransactionNotification.class));
+
+        verify(backoffStrategy).backOff(2);
     }
 
     private void simulateUpdateFailureForAccount(AccountEntity accountEntity, Class<? extends Throwable> exceptionType) {

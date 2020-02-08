@@ -10,6 +10,7 @@ import spark.Service;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 class TransactionResource implements Resource {
@@ -23,7 +24,7 @@ class TransactionResource implements Resource {
         this.transactionService = transactionService;
     }
 
-    private Iterable<Transaction> getAllTransactions(Request request, Response response) {
+    private List<Transaction> getAllTransactions(Request request, Response response) {
         var accountId = Long.parseLong(request.params("accountId"));
 
         return transactionService.getAllTransactionsForAccountId(accountId);
@@ -35,7 +36,10 @@ class TransactionResource implements Resource {
 
         spark.exception(InvalidTransactionException.class, (exception, request, response) -> {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            response.body(exception.getMessage());
             LOGGER.error("An internal server error occurred.", exception);
         });
+
+        spark.after("/transactions/*", (request, response) -> response.type("application/json"));
     }
 }

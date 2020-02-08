@@ -2,6 +2,7 @@ package com.revolut.interview;
 
 import com.google.inject.AbstractModule;
 import com.revolut.interview.account.AccountsModule;
+import com.revolut.interview.notification.NotificationsModule;
 import com.revolut.interview.persistence.PersistenceModule;
 import com.revolut.interview.rest.SparkRestModule;
 import com.revolut.interview.transactions.TransactionModule;
@@ -16,5 +17,6 @@ public class ApplicationModule extends AbstractModule {
         install(new TransactionModule());
         install(new PersistenceModule());
         install(new SparkRestModule());
+        install(new NotificationsModule());
     }
 }

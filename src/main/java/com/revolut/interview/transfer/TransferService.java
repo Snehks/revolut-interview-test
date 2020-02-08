@@ -51,6 +51,10 @@ class TransferService {
         var receiverEntity = accountsDAO.findById(receiverId)
                 .orElseThrow(() -> new AccountNotFoundException(receiverId));
 
+        if (senderEntity.getBalance().compareTo(transferRequestDTO.getAmountToTransfer().getValue()) < 0) {
+            throw new InsufficientBalanceException(senderEntity.getBalance(), transferRequestDTO.getAmountToTransfer().getValue());
+        }
+
         return transactionDAO.save(
                 new TransactionEntity(
                         senderEntity,

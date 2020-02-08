@@ -57,3 +57,6 @@ Once the server is running use the following end points to interact with the ser
    It is not synchronous. This has been done to simulate the real bank model and to allow the transfer model to be scalable
    across multiple servers if needed. **_For the current implementation, it just runs the transfer on a separate thread._** 
     
+3. Transactions
+    - Get all the transactions for account id `GET` - `localhost:8000/transactions/{accountId}`
+    

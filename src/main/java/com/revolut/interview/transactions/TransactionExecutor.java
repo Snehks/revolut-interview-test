@@ -2,6 +2,9 @@ package com.revolut.interview.transactions;
 
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
+import com.revolut.interview.money.Money;
+import com.revolut.interview.notification.NotificationService;
+import com.revolut.interview.notification.TransactionNotification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
@@ -37,17 +40,24 @@ class TransactionExecutor {
     private final AccountsDAO accountsDAO;
     private final TransactionDAO transactionDAO;
 
+    private final NotificationService notificationService;
+    private final BackoffStrategy backoffStrategy;
+
     @Inject
     TransactionExecutor(@Named(MAX_ATTEMPTS) int maxAttempts,
                         Executor transactionExecutor,
                         Provider<Session> sessionProvider,
                         AccountsDAO accountsDAO,
-                        TransactionDAO transactionDAO) {
+                        TransactionDAO transactionDAO,
+                        NotificationService notificationService,
+                        BackoffStrategy backoffStrategy) {
         this.maxAttempts = maxAttempts;
         this.transactionExecutor = transactionExecutor;
         this.sessionProvider = sessionProvider;
         this.accountsDAO = accountsDAO;
         this.transactionDAO = transactionDAO;
+        this.notificationService = notificationService;
+        this.backoffStrategy = backoffStrategy;
     }
 
     void execute(Transaction transaction) {
@@ -95,6 +105,7 @@ class TransactionExecutor {
 
     private void retryIfNeeded(TransactionEntity transactionEntity, int attemptNumber) {
         if (attemptNumber < maxAttempts) {
+            backoffStrategy.backOff(attemptNumber + 1);
             executeTransaction(transactionEntity, attemptNumber + 1);
         } else {
             transactionFailed(transactionEntity);
@@ -139,10 +150,25 @@ class TransactionExecutor {
     private void transactionSuccessful(TransactionEntity transactionEntity) {
         transactionEntity.setTransactionState(SUCCEEDED);
         transactionDAO.update(transactionEntity);
+
+        sendNotification(transactionEntity, true);
     }
 
     private void transactionFailed(TransactionEntity transactionEntity) {
         transactionEntity.setTransactionState(FAILED);
         transactionDAO.update(transactionEntity);
+
+        sendNotification(transactionEntity, false);
+    }
+
+    private void sendNotification(TransactionEntity transactionEntity, boolean isSuccessful) {
+        //An assumption is made that this will never throw any exception.
+        notificationService.sendNotification(new TransactionNotification(
+                        transactionEntity.getSender().getId(),
+                        transactionEntity.getReceiver().getId(),
+                        isSuccessful,
+                        Money.valueOf(transactionEntity.getAmount())
+                )
+        );
     }
 }

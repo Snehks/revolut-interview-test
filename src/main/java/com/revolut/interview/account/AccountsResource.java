@@ -26,6 +26,8 @@ class AccountsResource implements Resource {
     public void register(Service spark) {
         spark.get("/account/:id", this::getAccount);
         spark.post("/account", this::addAccount);
+
+        spark.after("/account/*", (request, response) -> response.type("application/json"));
     }
 
     private Account getAccount(Request request, Response response) {

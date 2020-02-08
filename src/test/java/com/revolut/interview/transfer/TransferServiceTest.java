@@ -88,6 +88,13 @@ class TransferServiceTest {
     }
 
     @Test
+    void shouldThrowExceptionWhenBalanceIsInSufficient() {
+        assertThrows(InsufficientBalanceException.class,
+                () -> transferService.transfer(createTransferRequest(200))
+        );
+    }
+
+    @Test
     void shouldThrowExceptionWhenSenderAndReceiverAccountsAreSame() {
         assertThrows(IllegalArgumentException.class,
                 () -> transferService.transfer(new TransferRequest(1L, 1L, Money.valueOf(10)))
