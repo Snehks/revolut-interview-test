@@ -11,9 +11,12 @@
     - Junit 5 & Mockito - For testing and mocking
 
 ## Implementation Notes
-1. The solution implemented assumes that the account can have just a `Single Currency` stored in the account table. Extension is possible in future.
-2. Some of the Implemented database queries (like get all transactions) are not optimised for `HUGE` amounts of data. This can be improved in future.
-3. The solution has 3 different `Resources`
+1. This is a single gradle module project. This has been done to keep navigating through the project simple. 
+Ideally I would like to break the project down into multiple gradle modules which can depend on each other and can 
+build and run independently.
+2. The solution implemented assumes that the account can have just a `Single Currency` stored in the account table. Extension is possible in future.
+3. Some of the Implemented database queries (like get all transactions) are not optimised for `HUGE` amounts of data. This can be improved in future.
+4. The solution has 3 different `Resources`
     - Account - To create & retrieve accounts.
     - Transfer - To initiate a transfer between 2 accounts.
     - Transaction - To view all transactions and their states for a given account.
@@ -57,7 +60,7 @@ Once the server is running use the following end points to interact with the ser
 3. Transactions
     - Get all the transactions for account id `GET` - `localhost:8000/transactions/{accountId}`
     
-## Endpoints
+## Tests
 
 1. Unit Tests
     - Linux - `./gradlew clean test`
