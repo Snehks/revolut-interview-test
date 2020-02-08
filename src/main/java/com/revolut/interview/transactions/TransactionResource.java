@@ -16,6 +16,7 @@ import java.util.List;
 class TransactionResource implements Resource {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final String BASE_PATH = "/api/transactions";
 
     private final TransactionService transactionService;
 
@@ -32,7 +33,7 @@ class TransactionResource implements Resource {
 
     @Override
     public void register(Service spark) {
-        spark.get("/transactions/:accountId", this::getAllTransactions);
+        spark.get(BASE_PATH + "/:accountId", this::getAllTransactions);
 
         spark.exception(InvalidTransactionException.class, (exception, request, response) -> {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR_500);
@@ -40,6 +41,6 @@ class TransactionResource implements Resource {
             LOGGER.error("An internal server error occurred.", exception);
         });
 
-        spark.after("/transactions/*", (request, response) -> response.type("application/json"));
+        spark.after(BASE_PATH + "/*", (request, response) -> response.type("application/json"));
     }
 }

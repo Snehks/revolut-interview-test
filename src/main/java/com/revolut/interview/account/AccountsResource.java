@@ -13,6 +13,8 @@ import javax.inject.Singleton;
 @Singleton
 class AccountsResource implements Resource {
 
+    private static final String BASE_PATH = "/api/account";
+
     private final AccountsService accountsService;
     private final Gson gson;
 
@@ -24,10 +26,10 @@ class AccountsResource implements Resource {
 
     @Override
     public void register(Service spark) {
-        spark.get("/account/:id", this::getAccount);
-        spark.post("/account", this::addAccount);
+        spark.get(BASE_PATH + "/:id", this::getAccount);
+        spark.post(BASE_PATH, this::addAccount);
 
-        spark.after("/account/*", (request, response) -> response.type("application/json"));
+        spark.after(BASE_PATH + "/*", (request, response) -> response.type("application/json"));
     }
 
     private Account getAccount(Request request, Response response) {

@@ -36,6 +36,8 @@ import static org.mockito.Mockito.verify;
 class TransferResourceIntegrationTest {
 
     private static final int PORT = 8001;
+    private static final String BASE_PATH = "/api/transfer";
+
     private static final BigDecimal BALANCE = BigDecimal.TEN;
 
     private Injector injector;
@@ -79,7 +81,7 @@ class TransferResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body(transferRequest)
-                .post("/transfer");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.OK_200);
 
@@ -109,7 +111,7 @@ class TransferResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body(new TransferRequest(sender.getId(), sender.getId(), BigDecimal.valueOf(5)))
-                .post("/transfer");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);
     }
@@ -120,7 +122,7 @@ class TransferResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body(transferRequest)
-                .post("/transfer");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);
     }
@@ -142,7 +144,7 @@ class TransferResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body(new TransferRequest(-1L, receiver.getId(), BigDecimal.valueOf(20)))
-                .post("/transfer");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);
     }

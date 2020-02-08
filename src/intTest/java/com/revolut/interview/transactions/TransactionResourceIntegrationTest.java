@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TransactionResourceIntegrationTest {
 
+    private static final String BASE_PATH = "/api/transactions";
+
     private static final int PORT = 8001;
 
     private Injector injector;
@@ -50,7 +52,7 @@ class TransactionResourceIntegrationTest {
     void getTransactionsShouldReturnEmptyJsonWhenNoTransactionExists() {
         given()
                 .port(PORT)
-                .get("/transactions/1")
+                .get(BASE_PATH + "/1")
                 .then()
                 .body(equalTo("[]"))
                 .statusCode(HttpStatus.OK_200);
@@ -72,7 +74,7 @@ class TransactionResourceIntegrationTest {
 
         var response = given()
                 .port(PORT)
-                .get("/transactions/" + account1.getId());
+                .get(BASE_PATH + "/" + account1.getId());
 
         response.then().statusCode(HttpStatus.OK_200);
 

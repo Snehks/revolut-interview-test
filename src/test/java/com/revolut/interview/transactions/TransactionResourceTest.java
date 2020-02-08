@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransactionResourceTest {
 
+    private static final String BASE_PATH = "/api/transactions";
     @Mock
     private TransactionService transactionService;
 
@@ -53,7 +54,7 @@ class TransactionResourceTest {
         transactionResource.register(spark);
 
         var routeCaptor = ArgumentCaptor.forClass(Route.class);
-        verify(spark).get(eq("/transactions/:accountId"), routeCaptor.capture());
+        verify(spark).get(eq(BASE_PATH + "/:accountId"), routeCaptor.capture());
 
         @SuppressWarnings("unchecked")
         var allTransactions = (List<Transaction>) routeCaptor.getValue().handle(request, this.response);
@@ -67,6 +68,6 @@ class TransactionResourceTest {
     void registerShouldRegisterAllExpectedRoutes() {
         transactionResource.register(spark);
 
-        verify(spark).get(eq("/transactions/:accountId"), any(Route.class));
+        verify(spark).get(eq(BASE_PATH + "/:accountId"), any(Route.class));
     }
 }

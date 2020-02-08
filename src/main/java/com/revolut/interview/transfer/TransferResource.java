@@ -35,7 +35,7 @@ class TransferResource implements Resource {
 
     @Override
     public void register(Service spark) {
-        spark.post("/transfer", this::handleTransfer);
+        spark.post("/api/transfer", this::handleTransfer);
 
         spark.exception(AccountNotFoundException.class, (exception, request, response) -> {
             response.status(HttpStatus.BAD_REQUEST_400);
@@ -49,6 +49,6 @@ class TransferResource implements Resource {
             LOGGER.error(exception);
         });
 
-        spark.after("/transfer/*", (request, response) -> response.type("application/json"));
+        spark.after("/api/transfer/*", (request, response) -> response.type("application/json"));
     }
 }

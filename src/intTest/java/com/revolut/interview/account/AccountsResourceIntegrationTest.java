@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AccountsResourceIntegrationTest {
 
     private static final int PORT = 8001;
+    private static final String BASE_PATH = "/api/account";
 
     private Injector injector;
 
@@ -44,7 +45,7 @@ class AccountsResourceIntegrationTest {
     void getAccountShouldReturnEmptyBodyWhenAccountDoesNotExist() {
         given()
                 .port(PORT)
-                .get("/account/1")
+                .get(BASE_PATH + "/1")
                 .then()
                 .statusCode(HttpStatus.NOT_FOUND_404);
     }
@@ -57,7 +58,7 @@ class AccountsResourceIntegrationTest {
 
         var response = given()
                 .port(PORT)
-                .get("/account/" + savedAccount.getId());
+                .get(BASE_PATH + "/" + savedAccount.getId());
 
         response.then().statusCode(HttpStatus.OK_200);
 
@@ -72,7 +73,7 @@ class AccountsResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body(new Account(null, BigDecimal.TEN))
-                .post("/account");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.OK_200);
 
@@ -90,7 +91,7 @@ class AccountsResourceIntegrationTest {
         var response = given()
                 .port(PORT)
                 .body("{\"id\":1,\"balance\":-1}") //because the java object does not allow creation with negative values.
-                .post("/account");
+                .post(BASE_PATH);
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);
     }

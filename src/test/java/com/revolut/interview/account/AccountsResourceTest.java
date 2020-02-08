@@ -58,7 +58,7 @@ class AccountsResourceTest {
         accountsResource.register(spark);
 
         var routeCaptor = ArgumentCaptor.forClass(Route.class);
-        verify(spark).get(eq("/account/:id"), routeCaptor.capture());
+        verify(spark).get(eq("/api/account/:id"), routeCaptor.capture());
 
         var actualAccount = routeCaptor.getValue().handle(request, this.response);
         assertEquals(expectedAccount.get(), actualAccount);
@@ -72,7 +72,7 @@ class AccountsResourceTest {
         accountsResource.register(spark);
 
         var routeCaptor = ArgumentCaptor.forClass(Route.class);
-        verify(spark).get(eq("/account/:id"), routeCaptor.capture());
+        verify(spark).get(eq("/api/account/:id"), routeCaptor.capture());
 
         var accountResponse = routeCaptor.getValue().handle(request, response);
 
@@ -91,7 +91,7 @@ class AccountsResourceTest {
         when(accountsService.save(accountToBeCreated)).thenReturn(accountToBeCreated);
 
         var routeCaptor = ArgumentCaptor.forClass(Route.class);
-        verify(spark).post(eq("/account"), routeCaptor.capture());
+        verify(spark).post(eq("/api/account"), routeCaptor.capture());
 
         var actualAccount = routeCaptor.getValue().handle(request, response);
         assertEquals(accountToBeCreated, actualAccount);
@@ -101,7 +101,7 @@ class AccountsResourceTest {
     void registerShouldRegisterEndpointsWithValidRoutes() {
         accountsResource.register(spark);
 
-        verify(spark).post(eq("/account"), any(Route.class));
-        verify(spark).get(eq("/account/:id"), any(Route.class));
+        verify(spark).post(eq("/api/account"), any(Route.class));
+        verify(spark).get(eq("/api/account/:id"), any(Route.class));
     }
 }

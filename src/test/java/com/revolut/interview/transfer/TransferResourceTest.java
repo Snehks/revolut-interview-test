@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransferResourceTest {
 
+    private static final String BASE_PATH = "/api/transfer";
     @Mock
     private TransferService transferService;
 
@@ -52,7 +53,7 @@ class TransferResourceTest {
         transferResource.register(spark);
 
         var routeCaptor = ArgumentCaptor.forClass(Route.class);
-        verify(spark).post(eq("/transfer"), routeCaptor.capture());
+        verify(spark).post(eq(BASE_PATH), routeCaptor.capture());
 
         routeCaptor.getValue().handle(request, response);
         verify(transferService).transfer(transferRequest);
@@ -62,6 +63,6 @@ class TransferResourceTest {
     void registerShouldRegisterEndpointsWithValidRoutes() {
         transferResource.register(spark);
 
-        verify(spark).post(eq("/transfer"), any(Route.class));
+        verify(spark).post(eq(BASE_PATH), any(Route.class));
     }
 }
