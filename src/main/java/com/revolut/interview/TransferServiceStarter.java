@@ -26,7 +26,7 @@ public class TransferServiceStarter {
         var allResources = injector.getInstance(Key.get(new TypeLiteral<Set<Resource>>() {
         }));
 
-        allResources.forEach(allResource -> allResource.register(spark));
+        allResources.forEach(resource -> resource.register(spark));
 
         getRuntime().addShutdownHook(new Thread(spark::stop));
     }

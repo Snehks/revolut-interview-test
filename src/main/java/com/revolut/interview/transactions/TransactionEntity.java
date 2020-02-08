@@ -27,7 +27,7 @@ public class TransactionEntity extends BaseEntity {
     private BigDecimal amount;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = "state")
+    @Column(name = "state", nullable = false)
     private TransactionState transactionState;
 
     public TransactionEntity() {
