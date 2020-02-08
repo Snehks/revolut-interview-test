@@ -24,14 +24,6 @@ class AccountsResource implements Resource {
         this.gson = gson;
     }
 
-    @Override
-    public void register(Service spark) {
-        spark.get(BASE_PATH + "/:id", this::getAccount);
-        spark.post(BASE_PATH, this::addAccount);
-
-        spark.after(BASE_PATH + "/*", (request, response) -> response.type("application/json"));
-    }
-
     private Account getAccount(Request request, Response response) {
         var accountId = Long.valueOf(request.params("id"));
 
@@ -49,5 +41,13 @@ class AccountsResource implements Resource {
     private Account addAccount(Request request, Response response) {
         var accountToSave = gson.fromJson(request.body(), Account.class);
         return accountsService.save(accountToSave);
+    }
+
+    @Override
+    public void register(Service spark) {
+        spark.get(BASE_PATH + "/:id", this::getAccount);
+        spark.post(BASE_PATH, this::addAccount);
+
+        spark.after(BASE_PATH + "/*", (request, response) -> response.type("application/json"));
     }
 }

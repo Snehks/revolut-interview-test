@@ -5,6 +5,7 @@ import com.revolut.interview.rest.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.http.HttpStatus;
+import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
 import spark.Service;
@@ -37,18 +38,17 @@ class TransferResource implements Resource {
     public void register(Service spark) {
         spark.post("/api/transfer", this::handleTransfer);
 
-        spark.exception(AccountNotFoundException.class, (exception, request, response) -> {
-            response.status(HttpStatus.BAD_REQUEST_400);
-            response.body(exception.getMessage());
-            LOGGER.error(exception);
-        });
-
-        spark.exception(InsufficientBalanceException.class, (exception, request, response) -> {
-            response.status(HttpStatus.BAD_REQUEST_400);
-            response.body(exception.getMessage());
-            LOGGER.error(exception);
-        });
+        spark.exception(AccountNotFoundException.class, getBadRequestHandler());
+        spark.exception(InsufficientBalanceException.class, getBadRequestHandler());
 
         spark.after("/api/transfer/*", (request, response) -> response.type("application/json"));
+    }
+
+    private ExceptionHandler<Exception> getBadRequestHandler() {
+        return (exception, request, response) -> {
+            response.status(HttpStatus.BAD_REQUEST_400);
+            response.body(exception.getMessage());
+            LOGGER.error(exception);
+        };
     }
 }
