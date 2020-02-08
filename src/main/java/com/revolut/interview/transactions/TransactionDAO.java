@@ -27,8 +27,14 @@ public class TransactionDAO extends AbstractDAO<TransactionEntity> {
         });
     }
 
-    //TODO: This will return entire database, not very scalable.
+    @SuppressWarnings("unchecked")
     public List<TransactionEntity> findAllWithAccountId(long accountId) {
-        return null;
+        return runInTransactionOrStartNewIfNotRunning(session -> {
+            var query = session.createQuery("FROM transactions WHERE sender_id = :sender_id OR receiver_id = :receiver_id");
+            query.setParameter("sender_id", accountId);
+            query.setParameter("receiver_id", accountId);
+
+            return query.list();
+        });
     }
 }

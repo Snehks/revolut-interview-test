@@ -40,7 +40,7 @@ class AccountsServiceTest {
                 .orElseThrow();
 
         assertEquals(1, account.getId().longValue());
-        assertEquals(BigDecimal.TEN, account.getBalance().getValue());
+        assertEquals(BigDecimal.TEN.compareTo(account.getBalance().getValue()), 0);
     }
 
     @Test
@@ -66,7 +66,7 @@ class AccountsServiceTest {
 
         var entityRequestedToBeSaved = accountEntityCaptor.getValue();
 
-        assertEquals(savedAccountEntity.getBalance().getValue(), entityRequestedToBeSaved.getBalance());
+        assertEquals(savedAccountEntity.getBalance().getValue().compareTo(entityRequestedToBeSaved.getBalance()), 0);
         assertEquals(savedAccountEntity.getId(), entityRequestedToBeSaved.getId());
     }
 }

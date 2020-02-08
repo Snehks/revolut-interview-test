@@ -80,12 +80,12 @@ public class TransactionEntity extends BaseEntity {
         TransactionEntity that = (TransactionEntity) o;
         return Objects.equals(sender, that.sender) &&
                 Objects.equals(receiver, that.receiver) &&
-                Objects.equals(amount.stripTrailingZeros(), that.amount.stripTrailingZeros()) &&
+                amount.compareTo(that.amount) == 0 &&
                 transactionState == that.transactionState;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), sender, receiver, amount.stripTrailingZeros(), transactionState);
+        return Objects.hash(super.hashCode(), sender, receiver, amount, transactionState);
     }
 }

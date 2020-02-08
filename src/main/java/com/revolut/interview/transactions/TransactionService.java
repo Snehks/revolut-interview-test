@@ -2,6 +2,7 @@ package com.revolut.interview.transactions;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -16,7 +17,8 @@ public class TransactionService {
         this.transactionDAO = transactionDAO;
     }
 
-    public Iterable<Transaction> getAllTransactionsForAccountId(long accountId) {
+    public List<Transaction> getAllTransactionsForAccountId(long accountId) {
+        //This returns all the records where accountId is sender or receiver. Not very scalable.
         return transactionDAO.findAllWithAccountId(accountId)
                 .stream()
                 .map(this::map)
@@ -25,10 +27,10 @@ public class TransactionService {
 
     public void queue(long transactionId) {
         var transactionEntity = transactionDAO.findById(transactionId)
-                .orElseThrow(() -> new IllegalArgumentException("No transaction with id " + transactionId));
+                .orElseThrow(() -> new InvalidTransactionException("No transaction with id " + transactionId, transactionId));
 
         if (transactionEntity.getTransactionState() != TransactionState.PENDING) {
-            throw new IllegalArgumentException("Trying to queue a transaction which is not pending " + transactionEntity.getTransactionState());
+            throw new InvalidTransactionException("Trying to queue a transaction which is not pending " + transactionEntity.getTransactionState(), transactionId);
         }
 
         transactionExecutor.execute(map(transactionEntity));

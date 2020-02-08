@@ -22,15 +22,17 @@ class TransactionDAOIntegrationTest {
 
     private AccountEntity sender;
     private AccountEntity receiver;
+    private AccountsDAO accountsDAO;
 
     @BeforeEach
     void setUp() {
         var injector = Guice.createInjector(new PersistenceModule());
 
         this.transactionDAO = injector.getInstance(TransactionDAO.class);
+        this.accountsDAO = injector.getInstance(AccountsDAO.class);
         this.sessionProvider = injector.getProvider(Session.class);
 
-        setUpAccounts(injector.getInstance(AccountsDAO.class));
+        setUpAccounts();
     }
 
     @Test
@@ -88,7 +90,35 @@ class TransactionDAOIntegrationTest {
         assertEquals(TransactionState.PENDING, entityById.getTransactionState());
     }
 
-    private void setUpAccounts(AccountsDAO accountsDAO) {
+    @Test
+    void findAllShouldReturnEmptyListWhenNoTransactionForAccountId() {
+        var toSave = new TransactionEntity(sender, receiver, BigDecimal.ONE, TransactionState.PENDING);
+        transactionDAO.save(toSave);
+
+        var allTransactions = transactionDAO.findAllWithAccountId(4L);
+
+        assertTrue(allTransactions.isEmpty());
+    }
+
+    @Test
+    void findAllShouldReturnOnlyTheTransactionsForGivenAccountId() {
+        var transaction1 = new TransactionEntity(sender, receiver, BigDecimal.ONE, TransactionState.PENDING);
+        var transaction2 = new TransactionEntity(receiver, sender, BigDecimal.ONE, TransactionState.PENDING);
+        var transaction3 = new TransactionEntity(accountsDAO.save(new AccountEntity(BigDecimal.TEN)), receiver, BigDecimal.ONE, TransactionState.PENDING);
+
+        var savedTransaction1 = transactionDAO.save(transaction1);
+        var savedTransaction2 = transactionDAO.save(transaction2);
+        transactionDAO.save(transaction3);
+
+        var allTransactions = transactionDAO.findAllWithAccountId(sender.getId());
+
+        assertEquals(allTransactions.size(), 2);
+
+        assertTrue(allTransactions.contains(savedTransaction1));
+        assertTrue(allTransactions.contains(savedTransaction2));
+    }
+
+    private void setUpAccounts() {
         sender = accountsDAO.save(new AccountEntity(BigDecimal.ONE));
         receiver = accountsDAO.save(new AccountEntity(BigDecimal.TEN));
     }

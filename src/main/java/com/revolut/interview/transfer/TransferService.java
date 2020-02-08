@@ -1,6 +1,5 @@
 package com.revolut.interview.transfer;
 
-import com.revolut.interview.account.AccountNotFoundException;
 import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.transactions.TransactionDAO;
 import com.revolut.interview.transactions.TransactionEntity;

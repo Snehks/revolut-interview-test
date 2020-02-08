@@ -8,12 +8,18 @@ public class Transaction {
     private final long senderId;
     private final long receiverId;
     private final BigDecimal amountToTransfer;
+    private final TransactionState transactionState;
+
+    public Transaction(long transactionId, long senderId, long receiverId, BigDecimal amountToTransfer) {
+        this(transactionId, senderId, receiverId, amountToTransfer, null);
+    }
 
     public Transaction(long transactionId, long senderId, long receiverId, BigDecimal amountToTransfer, TransactionState transactionState) {
         this.transactionId = transactionId;
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.amountToTransfer = amountToTransfer;
+        this.transactionState = transactionState;
     }
 
     public long getTransactionId() {
@@ -30,6 +36,10 @@ public class Transaction {
 
     public BigDecimal getAmountToTransfer() {
         return amountToTransfer;
+    }
+
+    public TransactionState getTransactionState() {
+        return transactionState;
     }
 
     @Override

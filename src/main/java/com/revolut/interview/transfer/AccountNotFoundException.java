@@ -1,10 +1,10 @@
-package com.revolut.interview.account;
+package com.revolut.interview.transfer;
 
-public class AccountNotFoundException extends IllegalArgumentException {
+class AccountNotFoundException extends IllegalArgumentException {
 
     private final Long id;
 
-    public AccountNotFoundException(Long id) {
+    AccountNotFoundException(Long id) {
         super("Could not find account with id " + id);
         this.id = id;
     }

@@ -36,7 +36,7 @@ public class AccountEntity extends BaseEntity {
     @Override
     public String toString() {
         return "AccountEntity{" +
-                "balance=" + balance.stripTrailingZeros() +
+                "balance=" + balance +
                 ", version=" + version +
                 '}';
     }
@@ -47,12 +47,12 @@ public class AccountEntity extends BaseEntity {
         if (!(o instanceof AccountEntity)) return false;
         if (!super.equals(o)) return false;
         AccountEntity that = (AccountEntity) o;
-        return Objects.equals(balance.stripTrailingZeros(), that.balance.stripTrailingZeros()) &&
+        return balance.compareTo(that.balance) == 0 &&
                 Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), balance.stripTrailingZeros(), version);
+        return Objects.hash(super.hashCode(), balance, version);
     }
 }

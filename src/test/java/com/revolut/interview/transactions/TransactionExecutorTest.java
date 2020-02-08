@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TransactionExecutorTest {
 
-    private static final Transaction VALID_TRANSACTION = new Transaction(1L, 1L, 2L, TEN, transactionEntity.getTransactionState());
+    private static final Transaction VALID_TRANSACTION = new Transaction(1L, 1L, 2L, TEN, PENDING);
     private static final BigDecimal BALANCE = BigDecimal.valueOf(100);
 
     @Mock
@@ -82,7 +82,7 @@ class TransactionExecutorTest {
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhenTransactionDoesNotExist() {
-        var invalidTransaction = new Transaction(2L, 1L, 2L, BigDecimal.ONE, transactionEntity.getTransactionState());
+        var invalidTransaction = new Transaction(2L, 1L, 2L, BigDecimal.ONE, PENDING);
 
         assertThrows(IllegalArgumentException.class, () -> transactionExecutor.execute(invalidTransaction));
     }
@@ -135,7 +135,7 @@ class TransactionExecutorTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertEquals(BALANCE.add(VALID_TRANSACTION.getAmountToTransfer()), receiverAccountEntity.getBalance());
+        assertEquals(BALANCE.add(VALID_TRANSACTION.getAmountToTransfer()).compareTo(receiverAccountEntity.getBalance()), 0);
     }
 
     @Test

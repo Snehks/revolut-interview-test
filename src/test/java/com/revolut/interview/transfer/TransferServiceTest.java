@@ -2,7 +2,6 @@ package com.revolut.interview.transfer;
 
 import com.revolut.interview.account.Account;
 import com.revolut.interview.account.AccountEntity;
-import com.revolut.interview.account.AccountNotFoundException;
 import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.money.Money;
 import com.revolut.interview.transactions.TransactionDAO;
@@ -104,7 +103,7 @@ class TransferServiceTest {
 
         var transactionEntity = transactionEntityCaptor.getValue();
 
-        assertEquals(MONEY_TO_TRANSFER.getValue(), transactionEntity.getAmount());
+        assertEquals(MONEY_TO_TRANSFER.getValue().compareTo(transactionEntity.getAmount()), 0);
         assertEquals(SENDER.getId(), transactionEntity.getSender().getId());
         assertEquals(RECEIVER.getId(), transactionEntity.getReceiver().getId());
         assertEquals(PENDING, transactionEntity.getTransactionState());
