@@ -3,7 +3,6 @@ package com.revolut.interview.transfer;
 import com.revolut.interview.account.Account;
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
-import com.revolut.interview.money.Money;
 import com.revolut.interview.transactions.TransactionDAO;
 import com.revolut.interview.transactions.TransactionEntity;
 import com.revolut.interview.transactions.TransactionService;
@@ -27,9 +26,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class TransferServiceTest {
 
-    private static final Account SENDER = new Account(1L, Money.valueOf(BigDecimal.TEN));
-    private static final Account RECEIVER = new Account(2L, Money.valueOf(BigDecimal.ONE));
-    private static final Money MONEY_TO_TRANSFER = Money.valueOf(5);
+    private static final Account SENDER = new Account(1L, BigDecimal.TEN);
+    private static final Account RECEIVER = new Account(2L, BigDecimal.ONE);
+    private static final BigDecimal MONEY_TO_TRANSFER = BigDecimal.valueOf(5);
 
     private static final TransferRequest VALID_TRANSFER_REQUEST = new TransferRequest(
             SENDER.getId(),
@@ -97,7 +96,7 @@ class TransferServiceTest {
     @Test
     void shouldThrowExceptionWhenSenderAndReceiverAccountsAreSame() {
         assertThrows(IllegalArgumentException.class,
-                () -> transferService.transfer(new TransferRequest(1L, 1L, Money.valueOf(10)))
+                () -> transferService.transfer(new TransferRequest(1L, 1L, BigDecimal.valueOf(10)))
         );
     }
 
@@ -110,7 +109,7 @@ class TransferServiceTest {
 
         var transactionEntity = transactionEntityCaptor.getValue();
 
-        assertEquals(MONEY_TO_TRANSFER.getValue().compareTo(transactionEntity.getAmount()), 0);
+        assertEquals(MONEY_TO_TRANSFER.compareTo(transactionEntity.getAmount()), 0);
         assertEquals(SENDER.getId(), transactionEntity.getSender().getId());
         assertEquals(RECEIVER.getId(), transactionEntity.getReceiver().getId());
         assertEquals(PENDING, transactionEntity.getTransactionState());
@@ -119,11 +118,11 @@ class TransferServiceTest {
     private void setUpAccounts() {
         var sender = new AccountEntity();
         sender.setId(SENDER.getId());
-        sender.setBalance(SENDER.getBalance().getValue());
+        sender.setBalance(SENDER.getBalance());
 
         var receiver = new AccountEntity();
         receiver.setId(RECEIVER.getId());
-        receiver.setBalance(RECEIVER.getBalance().getValue());
+        receiver.setBalance(RECEIVER.getBalance());
 
         lenient()
                 .when(accountsDAO.findById(SENDER.getId()))
@@ -145,6 +144,6 @@ class TransferServiceTest {
     }
 
     private TransferRequest createTransferRequest(double amountToTransfer) {
-        return new TransferRequest(SENDER.getId(), RECEIVER.getId(), Money.valueOf(amountToTransfer));
+        return new TransferRequest(SENDER.getId(), RECEIVER.getId(), BigDecimal.valueOf(amountToTransfer));
     }
 }

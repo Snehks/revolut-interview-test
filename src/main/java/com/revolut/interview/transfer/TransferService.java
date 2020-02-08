@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.math.BigDecimal;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,15 +52,15 @@ class TransferService {
         var receiverEntity = accountsDAO.findById(receiverId)
                 .orElseThrow(() -> new AccountNotFoundException(receiverId));
 
-        if (senderEntity.getBalance().compareTo(transferRequestDTO.getAmountToTransfer().getValue()) < 0) {
-            throw new InsufficientBalanceException(senderEntity.getBalance(), transferRequestDTO.getAmountToTransfer().getValue());
+        if (senderEntity.getBalance().compareTo(transferRequestDTO.getAmountToTransfer()) < 0) {
+            throw new InsufficientBalanceException(senderEntity.getBalance(), transferRequestDTO.getAmountToTransfer());
         }
 
         return transactionDAO.save(
                 new TransactionEntity(
                         senderEntity,
                         receiverEntity,
-                        moneyToTransfer.getValue(),
+                        moneyToTransfer,
                         TransactionState.PENDING
                 )
         );
@@ -68,7 +69,7 @@ class TransferService {
     private void checkValidArgs(TransferRequest transferRequestDTO) {
         requireNonNull(transferRequestDTO);
 
-        if (transferRequestDTO.getAmountToTransfer().isLessThanEqualToZero()) {
+        if (transferRequestDTO.getAmountToTransfer().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Money to transfer should be greater than 0. Provided: " + transferRequestDTO.getAmountToTransfer());
         }
 

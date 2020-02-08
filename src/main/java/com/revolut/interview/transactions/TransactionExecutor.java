@@ -2,7 +2,6 @@ package com.revolut.interview.transactions;
 
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
-import com.revolut.interview.money.Money;
 import com.revolut.interview.notification.NotificationService;
 import com.revolut.interview.notification.TransactionNotification;
 import org.apache.logging.log4j.LogManager;
@@ -167,7 +166,7 @@ class TransactionExecutor {
                         transactionEntity.getSender().getId(),
                         transactionEntity.getReceiver().getId(),
                         isSuccessful,
-                        Money.valueOf(transactionEntity.getAmount())
+                        transactionEntity.getAmount()
                 )
         );
     }

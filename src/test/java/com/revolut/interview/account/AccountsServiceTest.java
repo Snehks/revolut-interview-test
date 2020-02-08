@@ -1,6 +1,5 @@
 package com.revolut.interview.account;
 
-import com.revolut.interview.money.Money;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,7 @@ class AccountsServiceTest {
                 .orElseThrow();
 
         assertEquals(1, account.getId().longValue());
-        assertEquals(BigDecimal.TEN.compareTo(account.getBalance().getValue()), 0);
+        assertEquals(BigDecimal.TEN.compareTo(account.getBalance()), 0);
     }
 
     @Test
@@ -59,14 +58,14 @@ class AccountsServiceTest {
             return accountEntity;
         });
 
-        var savedAccountEntity = accountsService.save(new Account(null, Money.valueOf(10)));
+        var savedAccountEntity = accountsService.save(new Account(null, BigDecimal.TEN));
 
         var accountEntityCaptor = ArgumentCaptor.forClass(AccountEntity.class);
         verify(accountsDAO).save(accountEntityCaptor.capture());
 
         var entityRequestedToBeSaved = accountEntityCaptor.getValue();
 
-        assertEquals(savedAccountEntity.getBalance().getValue().compareTo(entityRequestedToBeSaved.getBalance()), 0);
+        assertEquals(savedAccountEntity.getBalance().compareTo(entityRequestedToBeSaved.getBalance()), 0);
         assertEquals(savedAccountEntity.getId(), entityRequestedToBeSaved.getId());
     }
 }

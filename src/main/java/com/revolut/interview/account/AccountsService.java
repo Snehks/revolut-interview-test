@@ -1,7 +1,5 @@
 package com.revolut.interview.account;
 
-import com.revolut.interview.money.Money;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Optional;
@@ -22,11 +20,11 @@ class AccountsService {
     }
 
     Account save(Account account) {
-        if (account.getBalance().isLessThanZero()) {
+        if (account.isBalanceLessThanZero()) {
             throw new IllegalArgumentException("Money provided cannot be negative.");
         }
 
-        var entityToSave = new AccountEntity(account.getBalance().getValue());
+        var entityToSave = new AccountEntity(account.getBalance());
         var savedEntity = accountsDAO.save(entityToSave);
 
         return map(savedEntity);
@@ -35,7 +33,7 @@ class AccountsService {
     private Account map(AccountEntity entity) {
         return new Account(
                 entity.getId(),
-                Money.valueOf(entity.getBalance())
+                entity.getBalance()
         );
     }
 }

@@ -6,7 +6,6 @@ import com.google.inject.Injector;
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.account.AccountsModule;
-import com.revolut.interview.money.Money;
 import com.revolut.interview.notification.NotificationService;
 import com.revolut.interview.notification.TransactionNotification;
 import com.revolut.interview.persistence.PersistenceModule;
@@ -76,7 +75,7 @@ class TransferResourceIntegrationTest {
 
     @Test
     void transferShouldTransferMoneyFromSenderToReceiverWhenArgumentsProvidedAreValid() {
-        var transferRequest = new TransferRequest(sender.getId(), receiver.getId(), Money.valueOf(5));
+        var transferRequest = new TransferRequest(sender.getId(), receiver.getId(), BigDecimal.valueOf(5));
         var response = given()
                 .port(PORT)
                 .body(transferRequest)
@@ -109,7 +108,7 @@ class TransferResourceIntegrationTest {
     void transferShouldReturnBadRequestResponseWhenSenderAndReceiverAreTheSame() {
         var response = given()
                 .port(PORT)
-                .body(new TransferRequest(sender.getId(), sender.getId(), Money.valueOf(5)))
+                .body(new TransferRequest(sender.getId(), sender.getId(), BigDecimal.valueOf(5)))
                 .post("/transfer");
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);
@@ -117,7 +116,7 @@ class TransferResourceIntegrationTest {
 
     @Test
     void transferShouldReturnBadRequestResponseWhenBalanceIsLowWhenMakingTheTransfer() {
-        var transferRequest = new TransferRequest(sender.getId(), receiver.getId(), Money.valueOf(20));
+        var transferRequest = new TransferRequest(sender.getId(), receiver.getId(), BigDecimal.valueOf(20));
         var response = given()
                 .port(PORT)
                 .body(transferRequest)
@@ -135,14 +134,14 @@ class TransferResourceIntegrationTest {
         assertEquals(success, notification.isSuccess());
         assertEquals(transferRequest.getSenderId(), notification.getSenderId());
         assertEquals(transferRequest.getReceiverId(), notification.getReceiverId());
-        assertEquals(transferRequest.getAmountToTransfer(), notification.getAmount());
+        assertEquals(0, transferRequest.getAmountToTransfer().compareTo(notification.getAmount()));
     }
 
     @Test
     void transferShouldReturnBadRequestWhenSenderAccountDoesNotExist() {
         var response = given()
                 .port(PORT)
-                .body(new TransferRequest(-1L, receiver.getId(), Money.valueOf(20)))
+                .body(new TransferRequest(-1L, receiver.getId(), BigDecimal.valueOf(20)))
                 .post("/transfer");
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);

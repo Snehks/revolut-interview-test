@@ -2,7 +2,6 @@ package com.revolut.interview.transactions;
 
 import com.revolut.interview.account.AccountEntity;
 import com.revolut.interview.account.AccountsDAO;
-import com.revolut.interview.money.Money;
 import com.revolut.interview.notification.NotificationService;
 import com.revolut.interview.notification.TransactionNotification;
 import org.hibernate.Session;
@@ -106,7 +105,7 @@ class TransactionExecutorTest {
 
         verifyTransactionEntityState(FAILED);
 
-        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(BALANCE.add(TEN)));
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, BALANCE.add(TEN));
         verify(notificationService).sendNotification(notification);
     }
 
@@ -116,7 +115,7 @@ class TransactionExecutorTest {
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
-        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(BALANCE.add(TEN)));
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, BALANCE.add(TEN));
         verify(notificationService).sendNotification(notification);
     }
 
@@ -134,7 +133,7 @@ class TransactionExecutorTest {
     void notificationShouldBeSentWhenTransactionIsSuccessful() {
         transactionExecutor.execute(VALID_TRANSACTION);
 
-        var notification = new TransactionNotification(sender.getId(), receiver.getId(), true, Money.valueOf(VALID_TRANSACTION.getAmountToTransfer()));
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), true, VALID_TRANSACTION.getAmountToTransfer());
         verify(notificationService).sendNotification(notification);
     }
 
@@ -176,7 +175,7 @@ class TransactionExecutorTest {
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
-        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, Money.valueOf(VALID_TRANSACTION.getAmountToTransfer()));
+        var notification = new TransactionNotification(sender.getId(), receiver.getId(), false, VALID_TRANSACTION.getAmountToTransfer());
         verify(notificationService).sendNotification(notification);
     }
 

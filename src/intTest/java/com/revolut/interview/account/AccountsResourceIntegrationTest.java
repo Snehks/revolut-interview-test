@@ -2,7 +2,6 @@ package com.revolut.interview.account;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.revolut.interview.money.Money;
 import com.revolut.interview.persistence.PersistenceModule;
 import com.revolut.interview.rest.SparkRestModule;
 import org.eclipse.jetty.http.HttpStatus;
@@ -72,7 +71,7 @@ class AccountsResourceIntegrationTest {
     void addAccountShouldAddAnAccountOnDatabaseAndReturnAddedAccount() {
         var response = given()
                 .port(PORT)
-                .body(new Account(null, Money.valueOf(10)))
+                .body(new Account(null, BigDecimal.TEN))
                 .post("/account");
 
         response.then().statusCode(HttpStatus.OK_200);
@@ -90,7 +89,7 @@ class AccountsResourceIntegrationTest {
     void addAccountShouldReturnBadRequestWhenMoneyIsNegative() {
         var response = given()
                 .port(PORT)
-                .body("{\"id\":1,\"balance\":{\"value\":-1}}") //because the java object does not allow creation with negative values.
+                .body("{\"id\":1,\"balance\":-1}") //because the java object does not allow creation with negative values.
                 .post("/account");
 
         response.then().statusCode(HttpStatus.BAD_REQUEST_400);

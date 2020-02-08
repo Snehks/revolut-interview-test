@@ -1,7 +1,6 @@
 package com.revolut.interview.notification;
 
-import com.revolut.interview.money.Money;
-
+import java.math.BigDecimal;
 import java.util.Objects;
 
 public class TransactionNotification {
@@ -9,9 +8,9 @@ public class TransactionNotification {
     final long senderId;
     final long receiverId;
     final boolean success;
-    final Money amount;
+    final BigDecimal amount;
 
-    public TransactionNotification(long senderId, long receiverId, boolean success, Money amount) {
+    public TransactionNotification(long senderId, long receiverId, boolean success, BigDecimal amount) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.success = success;
@@ -30,7 +29,7 @@ public class TransactionNotification {
         return success;
     }
 
-    public Money getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
@@ -42,11 +41,21 @@ public class TransactionNotification {
         return senderId == that.senderId &&
                 receiverId == that.receiverId &&
                 success == that.success &&
-                Objects.equals(amount, that.amount);
+                this.amount.compareTo(that.amount) == 0;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(senderId, receiverId, success, amount);
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionNotification{" +
+                "senderId=" + senderId +
+                ", receiverId=" + receiverId +
+                ", success=" + success +
+                ", amount=" + amount +
+                '}';
     }
 }
