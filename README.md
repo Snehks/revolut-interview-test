@@ -47,9 +47,9 @@ Once the server is running use the following end points to interact with the ser
     - Transfer money `POST` - `localhost:8000/api/account/` with body                            
     ```json
    {
-   	"senderId": 1,
-   	"receiverId": 2,
-   	"amountToTransfer": 0.5
+   	  "senderId": 1,
+   	  "receiverId": 2,
+   	  "amountToTransfer": 0.5
    }
    ```
    This returns an `OK` response when transfer gets queued. The transfer can be executed anytime in the future. 
