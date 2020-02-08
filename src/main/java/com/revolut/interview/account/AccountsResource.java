@@ -35,7 +35,7 @@ class AccountsResource implements Resource {
 
         response.status(HttpStatus.NOT_FOUND_404);
 
-        return null;
+        return null; //really? Might be a good idea to get rid of this.
     }
 
     private Account addAccount(Request request, Response response) {
