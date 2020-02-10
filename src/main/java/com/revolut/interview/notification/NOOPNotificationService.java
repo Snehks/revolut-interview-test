@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.inject.Singleton;
 
 @Singleton
-class LoggerNotification implements NotificationService {
+class NOOPNotificationService implements NotificationService {
 
     private static final Logger LOGGER = LogManager.getLogger();
 

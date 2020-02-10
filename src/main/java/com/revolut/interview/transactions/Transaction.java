@@ -10,10 +10,6 @@ public class Transaction {
     private final BigDecimal amountToTransfer;
     private final TransactionState transactionState;
 
-    public Transaction(long transactionId, long senderId, long receiverId, BigDecimal amountToTransfer) {
-        this(transactionId, senderId, receiverId, amountToTransfer, null);
-    }
-
     public Transaction(long transactionId, long senderId, long receiverId, BigDecimal amountToTransfer, TransactionState transactionState) {
         this.transactionId = transactionId;
         this.senderId = senderId;

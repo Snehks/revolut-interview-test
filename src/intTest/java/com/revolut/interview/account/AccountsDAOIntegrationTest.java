@@ -195,13 +195,13 @@ class AccountsDAOIntegrationTest {
 
     //This behaviour is intentional as we don't want reading of accounts to fail when money is deposited to the bank account.
     @Test
-    void accountShouldBeReadWithoutExceptionsEvenWhenMultipleTransactionsAreUpdatingTheSameAccount() throws InterruptedException {
+    void accountShouldBeReadWithoutExceptionsEvenWhenMultipleTransactionsAreUpdatingTheSameAccount() throws InterruptedException, ExecutionException {
         var accountEntityToSave = new AccountEntity(BigDecimal.valueOf(1));
         var savedAccountEntityId = accountsDAO.save(accountEntityToSave).getId();
 
         var executorService = Executors.newFixedThreadPool(2);
 
-        executorService.execute(() -> {
+        executorService.submit(() -> {
             var updatesCount = 100;
 
             executorService.submit(() -> {
@@ -213,7 +213,7 @@ class AccountsDAOIntegrationTest {
             for (int i = 0; i < updatesCount; i++) {
                 accountsDAO.findById(savedAccountEntityId);
             }
-        });
+        }).get();
 
         executorService.shutdown();
         executorService.awaitTermination(1, TimeUnit.MINUTES);

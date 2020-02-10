@@ -8,8 +8,4 @@ class InvalidTransactionException extends IllegalArgumentException {
         super(message);
         this.transactionId = transactionId;
     }
-
-    public long getTransactionId() {
-        return transactionId;
-    }
 }

@@ -6,6 +6,6 @@ public class NotificationsModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(NotificationService.class).to(LoggerNotification.class);
+        bind(NotificationService.class).to(NOOPNotificationService.class);
     }
 }
