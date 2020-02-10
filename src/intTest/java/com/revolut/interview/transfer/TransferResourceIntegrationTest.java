@@ -27,6 +27,7 @@ import spark.Service;
 import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
+import static javax.persistence.LockModeType.READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -85,9 +86,9 @@ class TransferResourceIntegrationTest {
 
         response.then().statusCode(HttpStatus.OK_200);
 
-        var sender = accountsDAO.findById(this.sender.getId())
+        var sender = accountsDAO.findById(this.sender.getId(), READ)
                 .orElseThrow();
-        var receiver = accountsDAO.findById(this.receiver.getId())
+        var receiver = accountsDAO.findById(this.receiver.getId(), READ)
                 .orElseThrow();
 
         assertEquals(BALANCE.subtract(BigDecimal.valueOf(5)).compareTo(sender.getBalance()), 0);

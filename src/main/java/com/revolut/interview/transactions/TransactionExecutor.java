@@ -7,12 +7,12 @@ import com.revolut.interview.notification.TransactionNotification;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.StaleObjectStateException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.persistence.OptimisticLockException;
 import java.math.BigDecimal;
 import java.util.concurrent.Executor;
 
@@ -87,7 +87,7 @@ class TransactionExecutor {
         try {
             transferMoney(transactionEntity);
             dbTransaction.commit();
-        } catch (StaleObjectStateException e) {
+        } catch (OptimisticLockException e) {
             LOGGER.error("Transaction could not be completed because account was updated.", e);
 
             dbTransaction.rollback();

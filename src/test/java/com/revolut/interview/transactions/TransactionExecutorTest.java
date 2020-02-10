@@ -5,7 +5,6 @@ import com.revolut.interview.account.AccountsDAO;
 import com.revolut.interview.notification.NotificationService;
 import com.revolut.interview.notification.TransactionNotification;
 import org.hibernate.Session;
-import org.hibernate.StaleObjectStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.inject.Provider;
+import javax.persistence.OptimisticLockException;
 import java.math.BigDecimal;
 import java.util.Optional;
 
@@ -170,8 +170,8 @@ class TransactionExecutorTest {
     }
 
     @Test
-    void transactionShouldBeRolledBackIfAStaleObjectExceptionIsThrownWhileUpdatingSenderAccount() {
-        simulateUpdateFailureForAccount(sender, StaleObjectStateException.class);
+    void transactionShouldBeRolledBackIfAOptimisticLockExceptionIsThrownWhileUpdatingSenderAccount() {
+        simulateUpdateFailureForAccount(sender, OptimisticLockException.class);
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
@@ -180,8 +180,8 @@ class TransactionExecutorTest {
     }
 
     @Test
-    void notificationShouldBeSentWhenTransferFailsDueToStaleStateException() {
-        simulateUpdateFailureForAccount(sender, StaleObjectStateException.class);
+    void notificationShouldBeSentWhenTransferFailsDueToOptimisticLockException() {
+        simulateUpdateFailureForAccount(sender, OptimisticLockException.class);
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
@@ -190,8 +190,8 @@ class TransactionExecutorTest {
     }
 
     @Test
-    void transactionShouldBeRolledBackIfAStaleObjectExceptionIsThrownWhileUpdatingReceiverAccount() {
-        simulateUpdateFailureForAccount(receiver, StaleObjectStateException.class);
+    void transactionShouldBeRolledBackIfAOptimisticLockExceptionIsThrownWhileUpdatingReceiverAccount() {
+        simulateUpdateFailureForAccount(receiver, OptimisticLockException.class);
 
         transactionExecutor.execute(VALID_TRANSACTION);
 
@@ -233,7 +233,7 @@ class TransactionExecutorTest {
     }
 
     @Test
-    void multipleAttemptsShouldBeMadeToExecuteTransferWhenStaleStateObjectExceptionIsThrown() {
+    void multipleAttemptsShouldBeMadeToExecuteTransferWhenOptimisticLockExceptionIsThrown() {
         this.transactionExecutor = new TransactionExecutor(2,
                 Runnable::run,
                 sessionProvider,
@@ -241,7 +241,7 @@ class TransactionExecutorTest {
                 transactionDAO,
                 notificationService, backoffStrategy);
 
-        doThrow(StaleObjectStateException.class)
+        doThrow(OptimisticLockException.class)
                 .doNothing()
                 .when(accountsDAO)
                 .update(any(AccountEntity.class));

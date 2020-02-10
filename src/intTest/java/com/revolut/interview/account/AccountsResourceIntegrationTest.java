@@ -16,6 +16,7 @@ import spark.Service;
 import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
+import static javax.persistence.LockModeType.READ;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -83,7 +84,7 @@ class AccountsResourceIntegrationTest {
         var savedAccountId = jsonPath.getLong("id");
 
         var accountsDAO = injector.getInstance(AccountsDAO.class);
-        assertTrue(accountsDAO.findById(savedAccountId).isPresent());
+        assertTrue(accountsDAO.findById(savedAccountId, READ).isPresent());
     }
 
     @Test
