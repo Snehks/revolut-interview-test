@@ -9,7 +9,7 @@ public class TransferRequest {
     private final long receiverId;
     private final BigDecimal amountToTransfer;
 
-    public TransferRequest(long senderId, long receiverId, BigDecimal amountToTransfer) {
+    TransferRequest(long senderId, long receiverId, BigDecimal amountToTransfer) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.amountToTransfer = amountToTransfer;

@@ -38,11 +38,17 @@ Once the server is running use the following end points to interact with the ser
     ```json
     
    {
-       "id": null,
        "balance": 1
    }
    
     ```
+   **Response**
+   ```json
+   {
+     "id": 1,        
+     "balance":  1
+   }
+   ```
 2. Transfers
     - Transfer money `POST` - `localhost:8000/api/account/` with body                            
     ```json
@@ -60,8 +66,27 @@ Once the server is running use the following end points to interact with the ser
 3. Transactions
     - Get all the transactions for account id `GET` - `localhost:8000/transactions/{accountId}`
     
+    **Response**
+    ```json
+   [
+       {
+           "transactionId": 1,
+           "senderId": 1,
+           "receiverId": 2,
+           "amountToTransfer": 0.50,
+           "transactionState": "SUCCEEDED"
+       },
+       {
+           "transactionId": 2,
+           "senderId": 1,
+           "receiverId": 2,
+           "amountToTransfer": 0.50,
+           "transactionState": "SUCCEEDED"
+       }
+   ]
+   ```
+    
 ## Tests
-
 1. Unit Tests
     - Linux - `./gradlew clean test`
     - Windows - `gradlew.bat clean test`

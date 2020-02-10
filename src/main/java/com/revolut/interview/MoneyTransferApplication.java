@@ -10,7 +10,7 @@ import java.util.Set;
 
 import static java.lang.Runtime.getRuntime;
 
-public class TransferServiceStarter {
+public class MoneyTransferApplication {
 
     public static void main(String[] args) {
         startServer();

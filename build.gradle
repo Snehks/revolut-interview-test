@@ -5,7 +5,7 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 apply plugin: 'application'
-mainClassName = 'com.revolut.interview.TransferServiceStarter'
+mainClassName = 'com.revolut.interview.MoneyTransferApplication'
 
 ext {
     guice = '4.2.2'
