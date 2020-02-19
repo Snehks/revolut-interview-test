@@ -1,1 +1,2 @@
-java -jar ./revolut-interview.jar
+#!/bin/bash
+bash ./revolut-interview/bin/revolut-interview
