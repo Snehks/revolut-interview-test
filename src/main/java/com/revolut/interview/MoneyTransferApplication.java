@@ -21,7 +21,7 @@ public class MoneyTransferApplication {
 
         var spark = injector.getInstance(Service.class);
 
-        spark.port(8000);
+        spark.port(8080);
 
         var allResources = injector.getInstance(Key.get(new TypeLiteral<Set<Resource>>() {
         }));
