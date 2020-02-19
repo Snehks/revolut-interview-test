@@ -5,5 +5,5 @@ files:
     destination: /home/ec2-user
 hooks:
   ApplicationStart:
-    - location: ./runApp.sh
+    - location: ./runapp.sh
       timeout: 300
