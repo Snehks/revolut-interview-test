@@ -1,2 +1,2 @@
 #!/bin/bash
-bash ./revolut-interview/bin/revolut-interview
+bash ./build/install/revolut-interview/bin/revolut-interview
